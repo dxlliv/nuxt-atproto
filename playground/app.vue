@@ -147,7 +147,7 @@ onBeforeMount(() => {
     <section>
       <footer>
         <a
-          href="github.com/dxlliv/nuxt-atproto"
+          href="https://github.com/dxlliv/nuxt-atproto"
           target="_blank"
         >github.com/dxlliv/nuxt-atproto</a>
       </footer>
