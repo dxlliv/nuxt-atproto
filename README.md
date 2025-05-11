@@ -244,13 +244,6 @@ const likedPost = await atproto.agent.account.likePost({cid, uri})
 console.log(likedPost.data)
 ```
 
-**Parameters:**
-
-- `service` (optional): The base URL of the ATProto service.
-- `fetch` (optional): A custom fetch implementation.
-
-**Returns:** An object with both public AtpAgent or authenticated account Agent.
-
 <br />
 
 ## License
