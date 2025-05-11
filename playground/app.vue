@@ -222,7 +222,7 @@ section {
   }
 
   footer {
-    margin-top: 12px;
+    margin-top: 8px;
     opacity: 0.25;
   }
 }
