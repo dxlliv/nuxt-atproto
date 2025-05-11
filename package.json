@@ -1,6 +1,6 @@
 {
   "name": "nuxt-atproto",
-  "version": "0.0.15",
+  "version": "0.0.1",
   "description": "Interact with AT Protocol and Bluesky in your Nuxt.js application",
   "keywords": [
     "nuxt",
@@ -11,7 +11,7 @@
     "authentication"
   ],
   "license": "MIT",
-  "repository": "your-org/my-module",
+  "repository": "nuxt-atproto",
   "homepage": "https://github.com/dxlliv/nuxt-atproto",
   "author": {
     "name": "dxlliv",
@@ -64,5 +64,8 @@
     "typescript": "~5.8.3",
     "vitest": "^3.1.2",
     "vue-tsc": "^2.2.10"
+  },
+  "unbuild": {
+    "failOnWarn": false
   }
 }
