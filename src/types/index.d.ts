@@ -29,7 +29,7 @@ export interface AtprotoNuxtOptions {
         logo_uri: string
         tos_uri: string
         policy_uri: string
-        redirect_uris: [string, ...string[]]
+        redirect_uris: string[]
         scope: string
         grant_types: Array<any>
         response_types: Array<any>
