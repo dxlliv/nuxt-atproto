@@ -8,16 +8,12 @@
 > Easily integrate [Bluesky](https://bsky.app) login and [AT Protocol](https://atproto.com/) authentication into your
 Nuxt.js app.
 
-<br />
-
 ## Overview
 
 `nuxt-atproto` is a Nuxt.js module that simplifies the OAuth authentication via AT Protocol.
 
 It handles the login and the session management using the  `@atproto/oauth-client` library,  
 providing public and authenticated agents for seamless interaction with AT Protocol services.
-
-<br />
 
 ## Features
 
@@ -27,8 +23,6 @@ providing public and authenticated agents for seamless interaction with AT Proto
 - Access to the underlying client and session with `$atproto` provided by the plugin.
 - Dynamically generates `client-metadata.json` when the Nuxt.js app starts.
 
-<br />
-
 ## Installation
 
 Install the module via npm:
@@ -36,8 +30,6 @@ Install the module via npm:
 ```sh
 npm install nuxt-atproto
 ```
-
-<br />
 
 ## Configuration
 
@@ -99,8 +91,6 @@ especially `client_id` and `redirect_uris`, for the authentication flow to work 
 
 If you don't provide a remote URL in the module options, when Nuxt.js starts it will create a  `client-metadata.json` in your `public` folder.
 Using a local `client-metadata.json` generally offers a faster user experience compared to fetching it from a remote URL.
-
-<br />
 
 ## Usage
 
