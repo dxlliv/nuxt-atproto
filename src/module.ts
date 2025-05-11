@@ -1,4 +1,4 @@
-import { mkdirSync, rmSync, writeFileSync } from 'node:fs'
+import { mkdirSync, writeFileSync } from 'node:fs'
 import { defineNuxtModule, addPlugin, createResolver, addImportsDir } from '@nuxt/kit'
 import type { AtprotoNuxtOptions } from './types'
 
@@ -25,7 +25,7 @@ export default defineNuxtModule<AtprotoNuxtOptions>({
           logo_uri: '',
           tos_uri: '',
           policy_uri: '',
-          redirect_uris: [''],
+          redirect_uris: [],
           scope: 'atproto',
           grant_types: [],
           response_types: [],
@@ -63,23 +63,18 @@ export default defineNuxtModule<AtprotoNuxtOptions>({
 
     // generate /public/client-metadata.json when options.oauth.clientMetadata.remote is defined
 
-    if (!_options.oauth.clientMetadata.remote) {
-      try {
-        mkdirSync(publicDir, { recursive: true })
-      }
-      catch (error: any) {
-        console.error('Failed creating /public/client-metadata.json', error)
-        return
-      }
+    try {
+      mkdirSync(publicDir, { recursive: true })
+    }
+    catch (error: any) {
+      console.error('Failed creating /public/client-metadata.json', error)
+      return
+    }
 
-      writeFileSync(
-        publicDir + '/client-metadata.json',
-        JSON.stringify(_options.oauth.clientMetadata.local, null, 2),
-      )
-    }
-    else {
-      rmSync(publicDir + '/client-metadata.json')
-    }
+    writeFileSync(
+      publicDir + '/client-metadata.json',
+      JSON.stringify(_options.oauth.clientMetadata.local, null, 2),
+    )
 
     // add plugin
 
