@@ -79,6 +79,7 @@ export default defineNuxtModule<AtprotoNuxtOptions>({
     // add plugin
 
     addImportsDir(resolve('./runtime/composables'))
+    addImportsDir(resolve('./runtime/utils'))
     addPlugin(resolve('./runtime/plugin'))
   },
 })
