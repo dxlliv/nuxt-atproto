@@ -246,6 +246,24 @@ console.log(likedPost.data)
 
 <br />
 
+## 🧩 useAgent(service?: string, fetch?: any)
+
+A composable provided by `nuxt-atproto` that offers methods for user authentication and session management, including authenticating, signing out and session restore.
+
+```html
+
+<script setup lang="ts">
+const agent = useAgent('public')
+</script>
+```
+
+**Parameters:**
+
+- `service` (optional): Choose between `public`, `private` or a custom service endpoint.
+- `fetch` (optional): A custom fetch implementation.
+
+<br />
+
 ## License
 
 This package is released under the MIT license.

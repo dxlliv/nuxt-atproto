@@ -1,7 +1,6 @@
 import type { OAuthSession } from '@atproto/oauth-client'
-import { Agent, AtpAgent } from '@atproto/api'
 import { useRuntimeConfig, useNuxtApp } from 'nuxt/app'
-import { reactive } from 'vue'
+import { useAgent } from './useAgent'
 
 export function useAtproto(
   service?: string,
@@ -96,35 +95,6 @@ export function useAtproto(
     if (runtimeConfig.public.atproto.debug) {
       console.log('User signed out')
     }
-  }
-
-  /**
-   * Automatically use public or authenticated ATProto agent
-   *
-   * @param service
-   * @param fetch
-   */
-  function useAgent(
-    service?: string,
-    fetch?: any,
-  ) {
-    const { $atproto } = useNuxtApp()
-
-    const runtimeConfig = useRuntimeConfig()
-    if (!service) {
-      service = runtimeConfig.public.atproto.serviceEndpoint.public
-    }
-
-    let accountAgent
-
-    if ($atproto && $atproto.session.value) {
-      accountAgent = new Agent($atproto.session.value)
-    }
-
-    return reactive({
-      public: new AtpAgent({ service, fetch }),
-      account: accountAgent,
-    })
   }
 
   const agent = useAgent(service, fetch)
