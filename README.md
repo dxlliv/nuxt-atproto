@@ -230,19 +230,21 @@ Logs out the currently authenticated user and clears the stored session data.
 
 <br />
 
-### 🔢 agent
+### ➡️ isLogged()
 
-Provides an object containing both a public `AtpAgent` for general access and an authenticated `Agent` to perform actions that require a logged-in user, such as posting, following, and liking.
+Indicates whether the user is currently authenticated.
 
 ```ts
 const atproto = useAtproto()
 
-const profile = await atproto.agent.public.getProfile({actor: 'owdproject.org'})
-console.log(profile.data)
-
-const likedPost = await atproto.agent.account.likePost({cid, uri})
-console.log(likedPost.data)
+if (atproto.isLogged()) {
+  console.log('User is authenticated')
+} else {
+  console.log('User is not logged in')
+}
 ```
+
+**Returns**: Returns a boolean indicating whether the user is authenticated.
 
 <br />
 

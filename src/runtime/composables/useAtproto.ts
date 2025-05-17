@@ -97,13 +97,17 @@ export function useAtproto(
     }
   }
 
-  const agent = useAgent(service, fetch)
+  function isLogged() {
+    const { $atproto } = useNuxtApp()
+
+    return $atproto.session.value
+  }
 
   return {
     signIn,
     signInWithHandle,
     signOut,
     restore,
-    agent,
+    isLogged,
   }
 }
