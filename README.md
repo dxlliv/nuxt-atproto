@@ -237,14 +237,32 @@ Indicates whether the user is currently authenticated.
 ```ts
 const atproto = useAtproto()
 
-if (atproto.isLogged()) {
-  console.log('User is authenticated')
-} else {
-  console.log('User is not logged in')
+if (!atproto.isLogged()) {
+  return console.log('User is not logged in')
 }
+
+console.log('User is authenticated')
 ```
 
 **Returns**: Returns a boolean indicating whether the user is authenticated.
+
+<br />
+
+### ➡️ getSession()
+
+Retrieves the current session from the Nuxt application context.
+
+```ts
+const atproto = useAtproto()
+
+if (atproto.isLogged()) {
+  const session = atproto.getSession()
+  
+  console.log('User is logged in', session.sub)
+}
+```
+
+**Returns**: Returns the current AT Protocol OAuth Browser session.
 
 <br />
 
