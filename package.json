@@ -1,6 +1,6 @@
 {
   "name": "nuxt-atproto",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Interact with AT Protocol and Bluesky in your Nuxt.js application",
   "keywords": [
     "nuxt",
