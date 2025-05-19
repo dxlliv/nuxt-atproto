@@ -97,7 +97,23 @@ export function useAtproto(
     }
   }
 
-  function isLogged() {
+  /**
+   * Checks if a user is currently logged in by verifying the session status
+   *
+   * @return {boolean}
+   */
+  function isLogged(): boolean {
+    const { $atproto } = useNuxtApp()
+
+    return !!$atproto.session.value
+  }
+
+  /**
+   * Retrieves the current session from the Nuxt application context.
+   *
+   * @return {Object} The oauth session object from the `$atproto` instance.
+   */
+  function getSession(): any {
     const { $atproto } = useNuxtApp()
 
     return $atproto.session.value
@@ -109,5 +125,6 @@ export function useAtproto(
     signOut,
     restore,
     isLogged,
+    getSession,
   }
 }
