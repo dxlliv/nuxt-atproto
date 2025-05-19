@@ -2,11 +2,27 @@
 const atproto = useAtproto()
 const { hook } = useNuxtApp()
 
-async function fetchProfile(did: string) {
-  return atproto.agent.public.getProfile({ actor: did })
+/**
+ * Fetches the profile associated with a given decentralized identifier (DID).
+ *
+ * @param {string} did - The decentralized identifier (DID) of the profile to fetch.
+ * @return {Promise<Object>} A promise that resolves to the profile object associated with the given DID.
+ */
+async function fetchProfile(did: string): Promise<any> {
+  const agent = useAgent('public')
+
+  // fetch profile using the public agent
+  return agent.getProfile({ actor: did })
 }
 
-function saveProfile(did: string, profile: any) {
+/**
+ * Saves a user profile to local storage and updates the profiles reference.
+ *
+ * @param {string} did - The decentralized identifier (DID) of the user.
+ * @param {Object} profile - The profile data to be saved.
+ * @return {void} Does not return a value.
+ */
+function saveProfile(did: string, profile: any): void {
   const storedProfiles = JSON.parse(localStorage.getItem('profiles') || '{}')
 
   storedProfiles[did] = {
@@ -20,7 +36,13 @@ function saveProfile(did: string, profile: any) {
   updateProfiles()
 }
 
-function removeProfile(did: string) {
+/**
+ * Removes a profile from the stored profiles using the provided decentralized identifier (DID).
+ *
+ * @param {string} did - The decentralized identifier of the profile to be removed.
+ * @return {void} Does not return a value.
+ */
+function removeProfile(did: string): void {
   const storedProfiles = JSON.parse(localStorage.getItem('profiles') || '{}')
 
   delete storedProfiles[did]
@@ -31,20 +53,38 @@ function removeProfile(did: string) {
   updateProfiles()
 }
 
+/**
+ * A reactive variable storing an array of profile objects.
+ * Each object in the array represents a profile with the following properties:
+ * - `updatedAt`: A string representing the last update timestamp of the profile.
+ * - `profile`: An object containing the details of the profile.
+ */
 const profiles = ref<{ updatedAt: string, profile: any }[]>([])
 
-function updateProfiles() {
+/**
+ * Updates the profiles value by retrieving and parsing the data stored in the browser's local storage.
+ * If no profiles data is found in local storage, initializes with an empty object.
+ *
+ * @return {void} This method does not return a value.
+ */
+function updateProfiles(): void {
   profiles.value = JSON.parse(localStorage.getItem('profiles') || '{}')
 }
 
+/**
+ * Computed property representing the account details of the currently logged-in user.
+ * If the user is not logged in, this property will return null. Otherwise, it retrieves
+ * the current session and returns the associated profile info for the logged-in user.
+ */
 const account = computed(() => {
-  const { $atproto } = useNuxtApp()
-
-  if (!$atproto.session.value) {
+  if (!atproto.isLogged()) {
     return null
   }
 
-  return profiles.value[$atproto.session.value.sub]
+  const session = atproto.getSession()
+
+  // get current profile
+  return profiles.value[session.sub]
 })
 
 hook('atproto:sessionCreated', async (did: string) => {
