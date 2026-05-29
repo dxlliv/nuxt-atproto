@@ -1,19 +1,10 @@
-import type { OAuthSession } from '@atproto/oauth-client'
+import type { OAuthSession } from '@atproto/oauth-client-browser'
 import { useRuntimeConfig, useNuxtApp } from 'nuxt/app'
 import { invalidateAtprotoPrivateAgent } from '../utils/agentCache'
 
-export function useAtproto(
-  service?: string,
-  fetch?: any,
-) {
+export function useAtproto() {
   const runtimeConfig = useRuntimeConfig()
 
-  /**
-   * Sign in using ATProto
-   *
-   * @param serviceEndpoint
-   * @param options
-   */
   async function signIn(
     serviceEndpoint: string = runtimeConfig.public.atproto.serviceEndpoint.private,
     options = runtimeConfig.public.atproto.oauth.signInOptions,
@@ -30,16 +21,10 @@ export function useAtproto(
       )
     }
     catch (error) {
-      console.error(`Error during sign-in:`, error)
+      console.error('Error during sign-in:', error)
     }
   }
 
-  /**
-   * Sign in using ATProto with a specific handle
-   *
-   * @param handle
-   * @param options
-   */
   async function signInWithHandle(
     handle?: string,
     options = runtimeConfig.public.atproto.oauth.signInOptions,
@@ -47,20 +32,19 @@ export function useAtproto(
     const { $atproto } = useNuxtApp()
 
     try {
-      let handlePrompt = null
+      let resolvedHandle = handle
 
-      if (!handle) {
-        handlePrompt = window.prompt('Type your handle')
+      if (!resolvedHandle) {
+        const handlePrompt = window.prompt('Type your handle')
 
         if (!handlePrompt) {
           return
         }
 
-        handle = handlePrompt
+        resolvedHandle = handlePrompt
       }
 
-      // Generate the authorization URL for the provided handle
-      const url = await $atproto.client.authorize(handle, options)
+      const url = await $atproto.client.authorize(resolvedHandle, options)
 
       window.location.href = url.href
     }
@@ -69,9 +53,6 @@ export function useAtproto(
     }
   }
 
-  /**
-   * Resume session of an already logged account
-   */
   async function restore(did: string): Promise<OAuthSession> {
     const { $atproto } = useNuxtApp()
 
@@ -83,9 +64,6 @@ export function useAtproto(
     return session
   }
 
-  /**
-   * Sign out from ATProto
-   */
   async function signOut(): Promise<void> {
     const { $atproto } = useNuxtApp()
 
@@ -107,23 +85,13 @@ export function useAtproto(
     }
   }
 
-  /**
-   * Checks if a user is currently logged in by verifying the session status
-   *
-   * @return {boolean}
-   */
   function isLogged(): boolean {
     const { $atproto } = useNuxtApp()
 
     return !!$atproto.session.value
   }
 
-  /**
-   * Retrieves the current session from the Nuxt application context.
-   *
-   * @return {Object} The oauth session object from the `$atproto` instance.
-   */
-  function getSession(): any {
+  function getSession(): OAuthSession | undefined {
     const { $atproto } = useNuxtApp()
 
     return $atproto.session.value

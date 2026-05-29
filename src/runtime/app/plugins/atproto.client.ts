@@ -8,8 +8,6 @@ export default defineNuxtPlugin({
   async setup(_nuxtApp) {
     const runtimeConfig = useRuntimeConfig()
 
-    // define ATProto OAuth client options
-
     const clientOptions = {
       handleResolver: runtimeConfig.public.atproto.serviceEndpoint.private,
       onDelete: (sub: string, cause: unknown) => {
@@ -21,56 +19,54 @@ export default defineNuxtPlugin({
       },
     }
 
-    let atprotoOAuthClient: any
+    let atprotoOAuthClient: BrowserOAuthClient
 
-    const atprotoOAuthSession = ref<any>()
+    const atprotoOAuthSession = ref<OAuthSession | undefined>()
 
     if (runtimeConfig.public.atproto.oauth.clientMetadata.remote) {
       atprotoOAuthClient = await BrowserOAuthClient.load({
         ...clientOptions,
         clientId: runtimeConfig.public.atproto.oauth.clientMetadata.remote,
-        // todo implement custom fetch
       })
     }
     else {
       atprotoOAuthClient = new BrowserOAuthClient({
         ...clientOptions,
-        // @ts-ignore
-        clientMetadata: import.meta.env.MODE === 'development' ? undefined : runtimeConfig.public.atproto.oauth.clientMetadata.local,
-        // todo implement custom fetch
+        clientMetadata: import.meta.env.DEV
+          ? undefined
+          : runtimeConfig.public.atproto.oauth.clientMetadata.local,
       })
     }
 
-    // initialize the client and handle ATProto OAuth callbacks
-
     await atprotoOAuthClient.init()
       .then(async (result: undefined | { session: OAuthSession, state?: string | null }) => {
-        if (result) {
-          const { session, state } = result
-
-          if (runtimeConfig.public.atproto.debug) {
-            if (state != null) {
-              console.log(`${session.sub} was successfully authenticated (state: ${state})`)
-
-              _nuxtApp.hook('app:mounted', async () => {
-                _nuxtApp.hooks.callHook('atproto:sessionCreated', session.sub)
-              })
-            }
-            else {
-              console.log(`${session.sub} was restored (last active session)`)
-
-              _nuxtApp.hook('app:mounted', async () => {
-                _nuxtApp.hooks.callHook('atproto:sessionRestored', session.sub)
-              })
-            }
-          }
-
-          // assign OAuth session
-
-          atprotoOAuthSession.value = session
+        if (!result) {
+          return
         }
+
+        const { session, state } = result
+
+        if (runtimeConfig.public.atproto.debug) {
+          if (state != null) {
+            console.log(`${session.sub} was successfully authenticated (state: ${state})`)
+          }
+          else {
+            console.log(`${session.sub} was restored (last active session)`)
+          }
+        }
+
+        _nuxtApp.hook('app:mounted', () => {
+          if (state != null) {
+            _nuxtApp.hooks.callHook('atproto:sessionCreated', session.sub)
+          }
+          else {
+            _nuxtApp.hooks.callHook('atproto:sessionRestored', session.sub)
+          }
+        })
+
+        atprotoOAuthSession.value = session
       })
-      .catch((error: any) => {
+      .catch((error: unknown) => {
         console.error('Error initializing ATProto client or restoring session:', error)
       })
 

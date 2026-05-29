@@ -73,25 +73,22 @@ export default defineNuxtModule<AtprotoNuxtOptions>({
       }
     })
 
-    // generate /public/client-metadata.json when options.oauth.clientMetadata.remote is defined
+    addImportsDir(resolve('./runtime/app/composables'))
+    addImportsDir(resolve('./runtime/app/utils'))
+    addPlugin({
+      src: resolve('./runtime/app/plugins/atproto.client'),
+      mode: 'client',
+    })
 
     try {
       mkdirSync(publicDir, { recursive: true })
+      writeFileSync(
+        `${publicDir}/client-metadata.json`,
+        JSON.stringify(_options.oauth.clientMetadata.local, null, 2),
+      )
     }
-    catch (error: any) {
-      console.error('Failed creating /public/client-metadata.json', error)
-      return
+    catch (error: unknown) {
+      console.warn('[nuxt-atproto] Failed to write public/client-metadata.json:', error)
     }
-
-    writeFileSync(
-      publicDir + '/client-metadata.json',
-      JSON.stringify(_options.oauth.clientMetadata.local, null, 2),
-    )
-
-    // add plugin
-
-    addImportsDir(resolve('./runtime/app/composables'))
-    addImportsDir(resolve('./runtime/app/utils'))
-    addPlugin(resolve('./runtime/app/plugins/plugin'))
   },
 })
