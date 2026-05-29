@@ -1,36 +1,77 @@
-import {useNuxtApp, useRuntimeConfig} from "#app";
-import {Agent, AtpAgent} from "@atproto/api";
+import { useNuxtApp, useRuntimeConfig, useState } from 'nuxt/app'
+import { Agent, AtpAgent } from '@atproto/api'
+import {
+  customAgentStateKey,
+  invalidateAtprotoPrivateAgent,
+  PRIVATE_AGENT_SESSION_KEY,
+  PRIVATE_AGENT_STATE_KEY,
+  publicAgentStateKey,
+} from '../utils/agentCache'
 
 /**
- * Provide AT Protocol agent
- *
- * @param service
- * @param fetch
+ * Returns a cached AT Protocol agent for the given scope.
+ * One instance per scope is shared across all components in the app.
  */
 export function useAgent(
-    service: string,
-    fetch?: any
+  service: 'private' | 'public' | (string & {}),
+  fetch?: typeof globalThis.fetch,
 ) {
-    const runtimeConfig = useRuntimeConfig()
+  const runtimeConfig = useRuntimeConfig()
+  const { $atproto } = useNuxtApp()
 
-    const {$atproto} = useNuxtApp()
+  switch (service) {
+    case 'private': {
+      if (!$atproto.session.value) {
+        invalidateAtprotoPrivateAgent()
+        throw new Error('Not authenticated')
+      }
 
-    switch(service) {
-        case 'private':
-            if (!$atproto.session.value) {
-                throw new Error('Not authenticated')
-            }
+      const sessionSub = $atproto.session.value.sub
+      const cachedAgent = useState<Agent | null>(PRIVATE_AGENT_STATE_KEY, () => null)
+      const cachedSessionSub = useState<string | null>(PRIVATE_AGENT_SESSION_KEY, () => null)
 
-            return new Agent($atproto.session.value)
-        case 'public':
-            return new AtpAgent({
-              service: runtimeConfig.public.atproto.serviceEndpoint.public,
-              fetch
-            })
-        default:
-            return new AtpAgent({
-              service,
-              fetch
-            })
+      if (cachedAgent.value && cachedSessionSub.value === sessionSub) {
+        return cachedAgent.value
+      }
+
+      const agent = new Agent($atproto.session.value)
+      cachedAgent.value = agent
+      cachedSessionSub.value = sessionSub
+
+      return agent
     }
+    case 'public': {
+      const endpoint = runtimeConfig.public.atproto.serviceEndpoint.public
+      const cacheKey = publicAgentStateKey(endpoint)
+      const cachedAgent = useState<AtpAgent | null>(cacheKey, () => null)
+
+      if (cachedAgent.value) {
+        return cachedAgent.value
+      }
+
+      const agent = new AtpAgent({
+        service: endpoint,
+        fetch,
+      })
+      cachedAgent.value = agent
+
+      return agent
+    }
+    default: {
+      const cacheKey = customAgentStateKey(service)
+      const cachedAgent = useState<AtpAgent | null>(cacheKey, () => null)
+
+      if (cachedAgent.value) {
+        return cachedAgent.value
+      }
+
+      const agent = new AtpAgent({
+        service,
+        fetch,
+      })
+      cachedAgent.value = agent
+
+      return agent
+    }
+  }
 }

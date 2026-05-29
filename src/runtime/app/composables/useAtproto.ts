@@ -1,6 +1,6 @@
 import type { OAuthSession } from '@atproto/oauth-client'
 import { useRuntimeConfig, useNuxtApp } from 'nuxt/app'
-import { useAgent } from './useAgent'
+import { invalidateAtprotoPrivateAgent } from '../utils/agentCache'
 
 export function useAtproto(
   service?: string,
@@ -77,6 +77,7 @@ export function useAtproto(
 
     const session = await $atproto.client.restore(did)
 
+    invalidateAtprotoPrivateAgent()
     $atproto.session.value = session
 
     return session
@@ -88,8 +89,17 @@ export function useAtproto(
   async function signOut(): Promise<void> {
     const { $atproto } = useNuxtApp()
 
-    $atproto.client.revoke($atproto.session.value.did)
+    const session = $atproto.session.value
+    if (session) {
+      try {
+        await $atproto.client.revoke(session.did)
+      }
+      catch (error) {
+        console.error('Error revoking ATProto session:', error)
+      }
+    }
 
+    invalidateAtprotoPrivateAgent()
     $atproto.session.value = undefined
 
     if (runtimeConfig.public.atproto.debug) {
