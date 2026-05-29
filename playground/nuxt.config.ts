@@ -1,6 +1,15 @@
 export default defineNuxtConfig({
   modules: ['../src/module'],
+  compatibilityDate: '2026-05-29',
   devtools: { enabled: true },
+  vite: {
+    optimizeDeps: {
+      include: [
+        '@vue/devtools-core',
+        '@vue/devtools-kit',
+      ],
+    },
+  },
   devServer: {
     host: '127.0.0.1',
   },

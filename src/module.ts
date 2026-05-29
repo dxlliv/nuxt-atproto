@@ -51,14 +51,26 @@ export default defineNuxtModule<AtprotoNuxtOptions>({
     _nuxt.options.runtimeConfig.public.atproto = _options
 
     _nuxt.options.build.transpile = _nuxt.options.build.transpile || []
-    _nuxt.options.build.transpile.push('@atproto/oauth-client-browser')
-    _nuxt.options.build.transpile.push('@atproto/api')
+    _nuxt.options.build.transpile.push(/@atproto\//)
 
     _nuxt.hook('vite:extendConfig', (config) => {
       config.optimizeDeps = config.optimizeDeps || {}
       config.optimizeDeps.include = config.optimizeDeps.include || []
-      config.optimizeDeps.include.push('@atproto/oauth-client-browser')
-      config.optimizeDeps.include.push('@atproto/api')
+      config.optimizeDeps.include.push('@atproto/oauth-client-browser', '@atproto/api')
+
+      // Ensure CJS dependencies of @atproto are handled
+      config.build = config.build || {}
+      config.build.commonjsOptions = config.build.commonjsOptions || {}
+      config.build.commonjsOptions.include = config.build.commonjsOptions.include || []
+      if (Array.isArray(config.build.commonjsOptions.include)) {
+        config.build.commonjsOptions.include.push(/node_modules\/core-js/)
+      }
+
+      // Nuxt 4/Vite 6+ might need a minimal process define for some legacy CJS
+      config.define = config.define || {}
+      if (!config.define['process.env']) {
+        config.define['process.env'] = {}
+      }
     })
 
     // generate /public/client-metadata.json when options.oauth.clientMetadata.remote is defined
@@ -78,8 +90,8 @@ export default defineNuxtModule<AtprotoNuxtOptions>({
 
     // add plugin
 
-    addImportsDir(resolve('./runtime/composables'))
-    addImportsDir(resolve('./runtime/utils'))
-    addPlugin(resolve('./runtime/plugin'))
+    addImportsDir(resolve('./runtime/app/composables'))
+    addImportsDir(resolve('./runtime/app/utils'))
+    addPlugin(resolve('./runtime/app/plugins/plugin'))
   },
 })

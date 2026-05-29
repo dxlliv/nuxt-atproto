@@ -120,13 +120,13 @@ onBeforeMount(() => {
       </a>
 
       <div style="margin-top: 32px;">
-        <Button @click="atproto.signIn()">
+        <button @click="atproto.signIn()">
           Sign-in with ATProto
-        </Button>
+        </button>
         <br>
-        <Button @click="atproto.signInWithHandle()">
+        <button @click="atproto.signInWithHandle()">
           Sign-in with ATProto using your handle (prompt)
-        </Button>
+        </button>
       </div>
     </section>
 
@@ -146,9 +146,9 @@ onBeforeMount(() => {
                 </a>
               </td>
               <td>
-                <Button @click="atproto.signOut()">
+                <button @click="atproto.signOut()">
                   Sign-out {{ account.profile.did }}
-                </Button>
+                </button>
               </td>
             </tr>
           </tbody>
@@ -164,7 +164,7 @@ onBeforeMount(() => {
 
         <table>
           <tbody>
-            <tr v-for="item of profiles">
+            <tr v-for="item of profiles" :key="item.profile.did">
               <td>
                 <a :href="`https://bsky.app/profile/${item.profile.handle}`">
                   <img :src="item.profile.avatar">
@@ -172,9 +172,9 @@ onBeforeMount(() => {
                 </a>
               </td>
               <td>
-                <Button @click="atproto.restore(item.profile.did)">
+                <button @click="atproto.restore(item.profile.did)">
                   Restore {{ item.profile.did }}
-                </Button>
+                </button>
               </td>
             </tr>
           </tbody>
@@ -266,4 +266,4 @@ section {
     opacity: 0.25;
   }
 }
-</style>>
+</style>
