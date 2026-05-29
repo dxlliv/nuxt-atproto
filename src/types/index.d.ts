@@ -1,10 +1,30 @@
+import type { BrowserOAuthClient, OAuthSession } from '@atproto/oauth-client-browser'
 import type { HookResult } from '@nuxt/schema'
+import type { Ref } from 'vue'
+
+export type AtprotoSessionStatus = 'initializing' | 'ready' | 'anonymous' | 'authenticated'
+
+export interface AtprotoContext {
+  client: BrowserOAuthClient
+  session: Ref<OAuthSession | undefined>
+  status: Ref<AtprotoSessionStatus>
+}
 
 declare module '#app' {
+  interface NuxtApp {
+    $atproto: AtprotoContext
+  }
+
   interface RuntimeNuxtHooks {
     'atproto:sessionCreated': (did: string) => HookResult
     'atproto:sessionRestored': (did: string) => HookResult
     'atproto:sessionDeleted': (did: string) => HookResult
+  }
+}
+
+declare module 'vue' {
+  interface ComponentCustomProperties {
+    $atproto: AtprotoContext
   }
 }
 
@@ -31,8 +51,8 @@ export interface AtprotoNuxtOptions {
         policy_uri: string
         redirect_uris: string[]
         scope: string
-        grant_types: Array<any>
-        response_types: Array<any>
+        grant_types: Array<string>
+        response_types: Array<string>
         token_endpoint_auth_method: string
         application_type: string
         dpop_bound_access_tokens: boolean
@@ -49,5 +69,7 @@ export interface AtprotoSignInOptions {
   scope: string
   ui_locales: string
 }
+
+export type { OAuthSession }
 
 export {}

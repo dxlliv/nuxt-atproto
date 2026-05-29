@@ -59,7 +59,7 @@ function removeProfile(did: string): void {
  * - `updatedAt`: A string representing the last update timestamp of the profile.
  * - `profile`: An object containing the details of the profile.
  */
-const profiles = ref<{ updatedAt: string, profile: any }[]>([])
+const profiles = ref<Record<string, { updatedAt: string, profile: any }>>({})
 
 /**
  * Updates the profiles value by retrieving and parsing the data stored in the browser's local storage.
@@ -82,9 +82,11 @@ const account = computed(() => {
   }
 
   const session = atproto.getSession()
+  if (!session) {
+    return null
+  }
 
-  // get current profile
-  return profiles.value[session.sub]
+  return profiles.value[session.sub] ?? null
 })
 
 hook('atproto:sessionCreated', async (did: string) => {

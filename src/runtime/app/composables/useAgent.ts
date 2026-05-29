@@ -1,4 +1,5 @@
-import { useNuxtApp, useRuntimeConfig, useState } from 'nuxt/app'
+import { useNuxtApp, useState } from 'nuxt/app'
+import { useAtprotoRuntimeConfig } from '../utils/useAtprotoRuntimeConfig'
 import { Agent, AtpAgent } from '@atproto/api'
 import {
   customAgentStateKey,
@@ -16,7 +17,7 @@ export function useAgent(
   service: 'private' | 'public' | (string & {}),
   fetch?: typeof globalThis.fetch,
 ) {
-  const runtimeConfig = useRuntimeConfig()
+  const atprotoConfig = useAtprotoRuntimeConfig()
   const { $atproto } = useNuxtApp()
 
   switch (service) {
@@ -41,7 +42,7 @@ export function useAgent(
       return agent
     }
     case 'public': {
-      const endpoint = runtimeConfig.public.atproto.serviceEndpoint.public
+      const endpoint = atprotoConfig.serviceEndpoint.public
       const cacheKey = publicAgentStateKey(endpoint)
       const cachedAgent = useState<AtpAgent | null>(cacheKey, () => null)
 

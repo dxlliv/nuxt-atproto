@@ -1,17 +1,20 @@
 import type { OAuthSession } from '@atproto/oauth-client-browser'
 import { BrowserOAuthClient } from '@atproto/oauth-client-browser'
-import { useRuntimeConfig, defineNuxtPlugin } from 'nuxt/app'
+import { defineNuxtPlugin } from 'nuxt/app'
+import { useAtprotoRuntimeConfig } from '../utils/useAtprotoRuntimeConfig'
 import { ref } from 'vue'
+import type { AtprotoSessionStatus } from '../../../types'
 
 export default defineNuxtPlugin({
   name: 'atproto',
   async setup(_nuxtApp) {
-    const runtimeConfig = useRuntimeConfig()
+    const atprotoConfig = useAtprotoRuntimeConfig()
+    const status = ref<AtprotoSessionStatus>('initializing')
 
     const clientOptions = {
-      handleResolver: runtimeConfig.public.atproto.serviceEndpoint.private,
+      handleResolver: atprotoConfig.serviceEndpoint.private,
       onDelete: (sub: string, cause: unknown) => {
-        if (runtimeConfig.public.atproto.debug) {
+        if (atprotoConfig.debug) {
           console.warn(`Session deleted for ${sub}. Cause:`, cause)
         }
 
@@ -23,30 +26,28 @@ export default defineNuxtPlugin({
 
     const atprotoOAuthSession = ref<OAuthSession | undefined>()
 
-    if (runtimeConfig.public.atproto.oauth.clientMetadata.remote) {
+    if (atprotoConfig.oauth.clientMetadata.remote) {
       atprotoOAuthClient = await BrowserOAuthClient.load({
         ...clientOptions,
-        clientId: runtimeConfig.public.atproto.oauth.clientMetadata.remote,
+        clientId: atprotoConfig.oauth.clientMetadata.remote,
       })
     }
     else {
       atprotoOAuthClient = new BrowserOAuthClient({
         ...clientOptions,
-        clientMetadata: import.meta.env.DEV
-          ? undefined
-          : runtimeConfig.public.atproto.oauth.clientMetadata.local,
+        ...(import.meta.env.DEV || !atprotoConfig.oauth.clientMetadata.local
+          ? {}
+          : { clientMetadata: atprotoConfig.oauth.clientMetadata.local as never }),
       })
     }
 
-    await atprotoOAuthClient.init()
-      .then(async (result: undefined | { session: OAuthSession, state?: string | null }) => {
-        if (!result) {
-          return
-        }
+    try {
+      const result = await atprotoOAuthClient.init()
 
+      if (result) {
         const { session, state } = result
 
-        if (runtimeConfig.public.atproto.debug) {
+        if (atprotoConfig.debug) {
           if (state != null) {
             console.log(`${session.sub} was successfully authenticated (state: ${state})`)
           }
@@ -65,16 +66,23 @@ export default defineNuxtPlugin({
         })
 
         atprotoOAuthSession.value = session
-      })
-      .catch((error: unknown) => {
-        console.error('Error initializing ATProto client or restoring session:', error)
-      })
+        status.value = 'authenticated'
+      }
+      else {
+        status.value = 'anonymous'
+      }
+    }
+    catch (error: unknown) {
+      console.error('Error initializing ATProto client or restoring session:', error)
+      status.value = 'anonymous'
+    }
 
     return {
       provide: {
         atproto: {
           client: atprotoOAuthClient,
           session: atprotoOAuthSession,
+          status,
         },
       },
     }

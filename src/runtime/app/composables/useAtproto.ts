@@ -1,13 +1,14 @@
 import type { OAuthSession } from '@atproto/oauth-client-browser'
-import { useRuntimeConfig, useNuxtApp } from 'nuxt/app'
+import { useNuxtApp } from 'nuxt/app'
 import { invalidateAtprotoPrivateAgent } from '../utils/agentCache'
+import { useAtprotoRuntimeConfig } from '../utils/useAtprotoRuntimeConfig'
 
 export function useAtproto() {
-  const runtimeConfig = useRuntimeConfig()
+  const atprotoConfig = useAtprotoRuntimeConfig()
 
   async function signIn(
-    serviceEndpoint: string = runtimeConfig.public.atproto.serviceEndpoint.private,
-    options = runtimeConfig.public.atproto.oauth.signInOptions,
+    serviceEndpoint: string = atprotoConfig.serviceEndpoint.private,
+    options = atprotoConfig.oauth.signInOptions,
   ): Promise<void> {
     const { $atproto } = useNuxtApp()
 
@@ -27,7 +28,7 @@ export function useAtproto() {
 
   async function signInWithHandle(
     handle?: string,
-    options = runtimeConfig.public.atproto.oauth.signInOptions,
+    options = atprotoConfig.oauth.signInOptions,
   ): Promise<void> {
     const { $atproto } = useNuxtApp()
 
@@ -80,7 +81,7 @@ export function useAtproto() {
     invalidateAtprotoPrivateAgent()
     $atproto.session.value = undefined
 
-    if (runtimeConfig.public.atproto.debug) {
+    if (atprotoConfig.debug) {
       console.log('User signed out')
     }
   }
