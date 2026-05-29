@@ -132,6 +132,13 @@ async function onSignInWithHandle(handle: string): Promise<void> {
         </p>
       </section>
 
+      <PlaygroundAuthPanel
+        v-if="isLogged"
+        add-account
+        @sign-in="signIn()"
+        @sign-in-with-handle="onSignInWithHandle"
+      />
+
       <section
         v-if="otherEntries.length > 0"
         class="panel"

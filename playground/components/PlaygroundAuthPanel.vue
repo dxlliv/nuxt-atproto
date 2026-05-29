@@ -1,4 +1,12 @@
 <script setup lang="ts">
+const props = withDefaults(
+  defineProps<{
+    /** When logged in, show a compact “add account” panel instead of the full sign-in hero. */
+    addAccount?: boolean
+  }>(),
+  { addAccount: false },
+)
+
 const emit = defineEmits<{
   signIn: []
   signInWithHandle: [handle: string]
@@ -17,8 +25,14 @@ function submitHandle(): void {
 </script>
 
 <template>
-  <section class="auth-card panel panel--featured">
-    <div class="auth-card__hero">
+  <section
+    class="auth-card panel"
+    :class="{ 'panel--featured': !props.addAccount, 'auth-card--compact': props.addAccount }"
+  >
+    <div
+      v-if="!props.addAccount"
+      class="auth-card__hero"
+    >
       <div
         class="auth-card__mark"
         aria-hidden="true"
@@ -51,6 +65,18 @@ function submitHandle(): void {
       </p>
     </div>
 
+    <header
+      v-else
+      class="auth-card__compact-header"
+    >
+      <h2 class="auth-card__compact-title">
+        Add another account
+      </h2>
+      <p class="auth-card__compact-lead">
+        Sign in with a different handle. Your current session stays cached locally.
+      </p>
+    </header>
+
     <div class="auth-card__methods">
       <button
         type="button"
@@ -72,9 +98,12 @@ function submitHandle(): void {
             />
           </svg>
         </span>
-        Continue with your PDS
+        {{ props.addAccount ? 'Continue with another PDS' : 'Continue with your PDS' }}
       </button>
-      <p class="auth-card__hint">
+      <p
+        v-if="!props.addAccount"
+        class="auth-card__hint"
+      >
         Redirects to your personal data server for authorization.
       </p>
 
@@ -120,13 +149,38 @@ function submitHandle(): void {
       </form>
     </div>
 
-    <p class="auth-card__footnote">
+    <p
+      v-if="!props.addAccount"
+      class="auth-card__footnote"
+    >
       Sessions stay in the browser on this device.
     </p>
   </section>
 </template>
 
 <style scoped>
+.auth-card--compact {
+  padding-top: 1.15rem;
+}
+
+.auth-card__compact-header {
+  margin-bottom: 1rem;
+}
+
+.auth-card__compact-title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.auth-card__compact-lead {
+  margin: 0.35rem 0 0;
+  font-size: 0.85rem;
+  line-height: 1.45;
+  color: var(--pg-muted);
+}
+
 .auth-card__hero {
   text-align: center;
   margin-bottom: 1.5rem;

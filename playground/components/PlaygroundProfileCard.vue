@@ -126,11 +126,10 @@ function formatRelativeTime(iso: string): string {
 }
 
 .profile-card--active {
-  border-color: rgba(0, 220, 130, 0.4);
+  border-color: rgba(0, 220, 130, 0.32);
   box-shadow:
     var(--pg-shadow-soft),
-    0 0 0 1px rgba(0, 220, 130, 0.15),
-    inset 3px 0 0 var(--pg-accent);
+    0 0 0 1px rgba(0, 220, 130, 0.1);
 }
 
 .profile-card__media {

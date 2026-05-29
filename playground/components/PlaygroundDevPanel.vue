@@ -6,18 +6,6 @@ defineProps<{
   isLogged: boolean
 }>()
 
-const agentCacheOk = ref<boolean | null>(null)
-
-onMounted(() => {
-  try {
-    const a = useAtprotoAgent('public')
-    const b = useAtprotoAgent('public')
-    agentCacheOk.value = a === b
-  }
-  catch {
-    agentCacheOk.value = null
-  }
-})
 </script>
 
 <template>
@@ -31,14 +19,6 @@ onMounted(() => {
       <div class="dev-panel__row">
         <dt>Logged in</dt>
         <dd><code>{{ isLogged }}</code></dd>
-      </div>
-      <div class="dev-panel__row">
-        <dt>Public agent cache</dt>
-        <dd>
-          <code v-if="agentCacheOk === true">shared instance</code>
-          <code v-else-if="agentCacheOk === false">not shared</code>
-          <code v-else>n/a</code>
-        </dd>
       </div>
     </dl>
   </details>
