@@ -3,12 +3,12 @@ const { session, isLogged } = useAtprotoSession()
 const { signIn, signInWithHandle, signOut, restore } = useAtprotoAuth()
 const { hook } = useNuxtApp()
 
-async function fetchProfile(did: string): Promise<any> {
+async function fetchProfile(did: string) {
   const agent = useAtprotoAgent('public')
   return agent.getProfile({ actor: did })
 }
 
-function saveProfile(did: string, profile: any): void {
+function saveProfile(did: string, profile: Record<string, unknown>): void {
   const storedProfiles = JSON.parse(localStorage.getItem('profiles') || '{}')
 
   storedProfiles[did] = {
@@ -23,13 +23,13 @@ function saveProfile(did: string, profile: any): void {
 function removeProfile(did: string): void {
   const storedProfiles = JSON.parse(localStorage.getItem('profiles') || '{}')
 
-  delete storedProfiles[did]
+  Reflect.deleteProperty(storedProfiles, did)
 
   localStorage.setItem('profiles', JSON.stringify(storedProfiles))
   updateProfiles()
 }
 
-const profiles = ref<Record<string, { updatedAt: string, profile: any }>>({})
+const profiles = ref<Record<string, { updatedAt: string, profile: Record<string, unknown> }>>({})
 
 function updateProfiles(): void {
   profiles.value = JSON.parse(localStorage.getItem('profiles') || '{}')
@@ -49,13 +49,13 @@ const account = computed(() => {
 })
 
 hook('atproto:sessionCreated', async (did: string) => {
-  const user: { data: any } = await fetchProfile(did)
-  saveProfile(did, user.data)
+  const user = await fetchProfile(did)
+  saveProfile(did, user.data as Record<string, unknown>)
 })
 
 hook('atproto:sessionRestored', async (did: string) => {
-  const user: { data: any } = await fetchProfile(did)
-  saveProfile(did, user.data)
+  const user = await fetchProfile(did)
+  saveProfile(did, user.data as Record<string, unknown>)
 })
 
 hook('atproto:sessionDeleted', (did: string) => {
@@ -138,7 +138,10 @@ async function signInWithHandlePrompt(): Promise<void> {
 
         <table>
           <tbody>
-            <tr v-for="item of Object.values(profiles)" :key="item.profile.did">
+            <tr
+              v-for="item of Object.values(profiles)"
+              :key="String(item.profile.did)"
+            >
               <td>
                 <a :href="`https://bsky.app/profile/${item.profile.handle}`">
                   <img :src="item.profile.avatar">

@@ -1,7 +1,7 @@
 import type { OAuthSession } from '@atproto/oauth-client-browser'
 import type { AtprotoSessionStatus } from '../../../types'
 import { useNuxtApp } from 'nuxt/app'
-import { computed, ref, shallowRef, type ComputedRef, type Ref } from 'vue'
+import { computed, shallowRef, type ComputedRef, type Ref } from 'vue'
 
 export interface UseAtprotoSessionReturn {
   session: Ref<OAuthSession | undefined>

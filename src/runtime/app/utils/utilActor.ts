@@ -6,7 +6,7 @@ export async function resolveActorDid(handle: string): Promise<string> {
   const { did } = await agent
     .com.atproto.identity
     .resolveHandle({
-      handle
+      handle,
     })
     .then(result => result.data)
 
@@ -17,7 +17,7 @@ export async function resolveActorServiceEndpoint(did: string): Promise<string> 
   const response = await fetch(`https://plc.directory/${did}`)
 
   if (!response.ok) {
-    throw new Error('Failed to fetch profile service endpoint');
+    throw new Error('Failed to fetch profile service endpoint')
   }
 
   const data = await response.json()

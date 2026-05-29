@@ -33,15 +33,11 @@ vi.mock('nuxt/app', () => ({
 }))
 
 vi.mock('@atproto/api', () => {
-  class MockAgent {
-    constructor() {
-      createdInstances.push(this)
-    }
+  function MockAgent(this: unknown) {
+    createdInstances.push(this)
   }
-  class MockAtpAgent {
-    constructor() {
-      createdInstances.push(this)
-    }
+  function MockAtpAgent(this: unknown) {
+    createdInstances.push(this)
   }
   return { Agent: MockAgent, AtpAgent: MockAtpAgent }
 })

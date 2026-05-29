@@ -4,6 +4,7 @@ import { defineNuxtPlugin } from 'nuxt/app'
 import { useAtprotoRuntimeConfig } from '../utils/useAtprotoRuntimeConfig'
 import { ref } from 'vue'
 import type { AtprotoSessionStatus } from '../../../types'
+import { scheduleAtprotoSessionHooks } from '../utils/sessionLifecycle'
 
 export default defineNuxtPlugin({
   name: 'atproto',
@@ -56,14 +57,7 @@ export default defineNuxtPlugin({
           }
         }
 
-        _nuxtApp.hook('app:mounted', () => {
-          if (state != null) {
-            _nuxtApp.hooks.callHook('atproto:sessionCreated', session.sub)
-          }
-          else {
-            _nuxtApp.hooks.callHook('atproto:sessionRestored', session.sub)
-          }
-        })
+        scheduleAtprotoSessionHooks(_nuxtApp.hooks, session.sub, state)
 
         atprotoOAuthSession.value = session
         status.value = 'authenticated'

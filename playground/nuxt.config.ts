@@ -1,7 +1,11 @@
 export default defineNuxtConfig({
   modules: ['../src/module'],
-  compatibilityDate: '2026-05-29',
+  ssr: false,
   devtools: { enabled: true },
+  devServer: {
+    host: '127.0.0.1',
+  },
+  compatibilityDate: '2026-05-29',
   vite: {
     optimizeDeps: {
       include: [
@@ -10,13 +14,10 @@ export default defineNuxtConfig({
       ],
     },
   },
-  devServer: {
-    host: '127.0.0.1',
-  },
   atproto: {
     serviceEndpoint: {
       private: 'https://bsky.social',
-      public: 'https://public.api.bsky.app'
+      public: 'https://public.api.bsky.app',
     },
     oauth: {
       clientMetadata: {
@@ -32,13 +33,13 @@ export default defineNuxtConfig({
           tos_uri: 'https://nuxt-atproto.pages.dev',
           policy_uri: 'https://nuxt-atproto.pages.dev',
           redirect_uris: ['https://nuxt-atproto.pages.dev'],
-          scope: "atproto transition:generic",
-          grant_types: ["authorization_code", "refresh_token"],
-          response_types: ["code"],
+          scope: 'atproto transition:generic',
+          grant_types: ['authorization_code', 'refresh_token'],
+          response_types: ['code'],
           token_endpoint_auth_method: 'none',
           application_type: 'web',
-          dpop_bound_access_tokens: true
-        }
+          dpop_bound_access_tokens: true,
+        },
       },
       signInOptions: {
         state: '',
@@ -49,5 +50,4 @@ export default defineNuxtConfig({
     },
     debug: true,
   },
-  ssr: false,
 })
