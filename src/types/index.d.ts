@@ -29,6 +29,10 @@ declare module 'vue' {
 }
 
 declare module 'nuxt/schema' {
+  /**
+   * Copied to `runtimeConfig.public.atproto` at build time.
+   * OAuth client metadata and endpoints are exposed to the client bundle by design.
+   */
   interface PublicRuntimeConfig {
     atproto: AtprotoNuxtOptions
   }
@@ -40,6 +44,11 @@ export interface AtprotoNuxtOptions {
     public: string
   }
   oauth: {
+    /**
+     * When true, writes `public/client-metadata.json` from `oauth.clientMetadata.local` during module setup.
+     * @default false
+     */
+    writeClientMetadata?: boolean
     clientMetadata: {
       remote?: string
       local?: {

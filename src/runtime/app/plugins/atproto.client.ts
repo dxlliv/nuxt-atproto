@@ -1,16 +1,17 @@
 import type { OAuthSession } from '@atproto/oauth-client-browser'
 import { BrowserOAuthClient } from '@atproto/oauth-client-browser'
 import { defineNuxtPlugin } from 'nuxt/app'
-import { useAtprotoRuntimeConfig } from '../utils/useAtprotoRuntimeConfig'
 import { ref } from 'vue'
-import type { AtprotoSessionStatus } from '../../../types'
-import { scheduleAtprotoSessionHooks } from '../utils/sessionLifecycle'
+import type { AtprotoContext, AtprotoSessionStatus } from '../../../types'
+import { useAtprotoRuntimeConfig } from '../utils/useAtprotoRuntimeConfig'
+import { applyAtprotoSession } from '../utils/sessionLifecycle'
 
 export default defineNuxtPlugin({
   name: 'atproto',
-  async setup(_nuxtApp) {
+  async setup(nuxtApp) {
     const atprotoConfig = useAtprotoRuntimeConfig()
     const status = ref<AtprotoSessionStatus>('initializing')
+    const atprotoOAuthSession = ref<OAuthSession | undefined>()
 
     const clientOptions = {
       handleResolver: atprotoConfig.serviceEndpoint.private,
@@ -19,13 +20,11 @@ export default defineNuxtPlugin({
           console.warn(`Session deleted for ${sub}. Cause:`, cause)
         }
 
-        _nuxtApp.hooks.callHook('atproto:sessionDeleted', sub)
+        nuxtApp.hooks.callHook('atproto:sessionDeleted', sub)
       },
     }
 
     let atprotoOAuthClient: BrowserOAuthClient
-
-    const atprotoOAuthSession = ref<OAuthSession | undefined>()
 
     if (atprotoConfig.oauth.clientMetadata.remote) {
       atprotoOAuthClient = await BrowserOAuthClient.load({
@@ -40,6 +39,12 @@ export default defineNuxtPlugin({
           ? {}
           : { clientMetadata: atprotoConfig.oauth.clientMetadata.local as never }),
       })
+    }
+
+    const atproto: AtprotoContext = {
+      client: atprotoOAuthClient,
+      session: atprotoOAuthSession,
+      status,
     }
 
     try {
@@ -57,10 +62,12 @@ export default defineNuxtPlugin({
           }
         }
 
-        scheduleAtprotoSessionHooks(_nuxtApp.hooks, session.sub, state)
-
-        atprotoOAuthSession.value = session
-        status.value = 'authenticated'
+        applyAtprotoSession(
+          nuxtApp,
+          session,
+          state != null ? 'oauth-return' : 'cold-restore',
+          { deferHooks: true, atproto },
+        )
       }
       else {
         status.value = 'anonymous'
@@ -73,11 +80,7 @@ export default defineNuxtPlugin({
 
     return {
       provide: {
-        atproto: {
-          client: atprotoOAuthClient,
-          session: atprotoOAuthSession,
-          status,
-        },
+        atproto,
       },
     }
   },

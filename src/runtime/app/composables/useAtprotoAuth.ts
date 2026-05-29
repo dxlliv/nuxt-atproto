@@ -1,7 +1,7 @@
 import type { OAuthSession } from '@atproto/oauth-client-browser'
 import type { AtprotoSignInOptions } from '../../../types'
 import { useNuxtApp } from 'nuxt/app'
-import { invalidateAtprotoPrivateAgent } from '../utils/agentCache'
+import { applyAtprotoSession } from '../utils/sessionLifecycle'
 import { useAtprotoRuntimeConfig } from '../utils/useAtprotoRuntimeConfig'
 
 export interface UseAtprotoAuthReturn {
@@ -66,33 +66,28 @@ export function useAtprotoAuth(): UseAtprotoAuthReturn {
   }
 
   async function restore(did: string): Promise<OAuthSession> {
-    const { $atproto } = useNuxtApp()
+    const nuxtApp = useNuxtApp()
+    const session = await nuxtApp.$atproto.client.restore(did)
 
-    const session = await $atproto.client.restore(did)
-
-    invalidateAtprotoPrivateAgent()
-    $atproto.session.value = session
-    $atproto.status.value = 'authenticated'
+    applyAtprotoSession(nuxtApp, session, 'account-switch')
 
     return session
   }
 
   async function signOut(): Promise<void> {
-    const { $atproto } = useNuxtApp()
+    const nuxtApp = useNuxtApp()
+    const session = nuxtApp.$atproto.session.value
 
-    const session = $atproto.session.value
     if (session) {
       try {
-        await $atproto.client.revoke(session.did)
+        await nuxtApp.$atproto.client.revoke(session.did)
       }
       catch (error) {
         console.error('Error revoking ATProto session:', error)
       }
     }
 
-    invalidateAtprotoPrivateAgent()
-    $atproto.session.value = undefined
-    $atproto.status.value = 'anonymous'
+    applyAtprotoSession(nuxtApp, undefined, 'sign-out')
 
     if (atprotoConfig.debug) {
       console.log('User signed out')

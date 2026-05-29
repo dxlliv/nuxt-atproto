@@ -1,4 +1,4 @@
-import { useAtprotoAgent } from '../composables/useAtprotoAgent'
+import { useAtprotoAgent } from '#imports'
 
 export async function resolveActorDid(handle: string): Promise<string> {
   const agent = useAtprotoAgent('public')

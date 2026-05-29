@@ -1,246 +1,210 @@
 <script setup lang="ts">
-const { session, isLogged } = useAtprotoSession()
-const { signIn, signInWithHandle, signOut, restore } = useAtprotoAuth()
-const { hook } = useNuxtApp()
-
-async function fetchProfile(did: string) {
-  const agent = useAtprotoAgent('public')
-  return agent.getProfile({ actor: did })
-}
-
-function saveProfile(did: string, profile: Record<string, unknown>): void {
-  const storedProfiles = JSON.parse(localStorage.getItem('profiles') || '{}')
-
-  storedProfiles[did] = {
-    updatedAt: new Date().toISOString(),
-    profile,
-  }
-
-  localStorage.setItem('profiles', JSON.stringify(storedProfiles))
-  updateProfiles()
-}
-
-function removeProfile(did: string): void {
-  const storedProfiles = JSON.parse(localStorage.getItem('profiles') || '{}')
-
-  Reflect.deleteProperty(storedProfiles, did)
-
-  localStorage.setItem('profiles', JSON.stringify(storedProfiles))
-  updateProfiles()
-}
-
-const profiles = ref<Record<string, { updatedAt: string, profile: Record<string, unknown> }>>({})
-
-function updateProfiles(): void {
-  profiles.value = JSON.parse(localStorage.getItem('profiles') || '{}')
-}
-
-const account = computed(() => {
-  if (!isLogged.value) {
-    return null
-  }
-
-  const currentSession = session.value
-  if (!currentSession) {
-    return null
-  }
-
-  return profiles.value[currentSession.sub] ?? null
+useHead({
+  title: 'nuxt-atproto playground',
+  meta: [
+    { name: 'description', content: 'Interactive demo for the nuxt-atproto Nuxt module' },
+  ],
 })
 
-hook('atproto:sessionCreated', async (did: string) => {
-  const user = await fetchProfile(did)
-  saveProfile(did, user.data as Record<string, unknown>)
+const { public: { docsUrl } } = useRuntimeConfig()
+
+const { loadFromStorage, entries } = useStoredProfiles()
+
+const {
+  session,
+  isLogged,
+  status,
+  signIn,
+  signInWithHandle,
+  signOut,
+  restore,
+  loadingProfile,
+  profileError,
+  currentEntry,
+  registerSessionHooks,
+} = usePlaygroundSession()
+
+const otherEntries = computed(() =>
+  entries.value.filter(entry => entry.profile.did !== session.value?.sub),
+)
+
+registerSessionHooks()
+
+onMounted(() => {
+  loadFromStorage()
 })
 
-hook('atproto:sessionRestored', async (did: string) => {
-  const user = await fetchProfile(did)
-  saveProfile(did, user.data as Record<string, unknown>)
-})
-
-hook('atproto:sessionDeleted', (did: string) => {
-  removeProfile(did)
-})
-
-onBeforeMount(() => {
-  updateProfiles()
-})
-
-const handleForSignIn = ref('')
-
-async function signInWithHandlePrompt(): Promise<void> {
-  const handle = handleForSignIn.value.trim() || window.prompt('Type your handle')?.trim()
-  if (!handle) {
-    return
-  }
+async function onSignInWithHandle(handle: string): Promise<void> {
   await signInWithHandle(handle)
 }
 </script>
 
 <template>
-  <client-only>
-    <section>
-      <h1>nuxt-atproto</h1>
-      <a
-        href="https://npmjs.com/package/nuxt-atproto"
-        target="_blank"
-      >
-        npmjs.com/package/nuxt-atproto
-      </a>
+  <div class="pg">
+    <header class="pg-header">
+      <div class="pg-header__bar">
+        <div class="pg-header__brand">
+          <h1 class="pg-header__title">
+            <span>nuxt</span>-atproto
+          </h1>
+          <p class="pg-header__tagline">
+            OAuth playground
+          </p>
+        </div>
 
-      <div style="margin-top: 32px;">
-        <button @click="signIn()">
-          Sign-in with ATProto
-        </button>
-        <br>
-        <input
-          v-model="handleForSignIn"
-          placeholder="handle (e.g. user.bsky.social)"
-          style="margin: 8px 0; padding: 8px;"
+        <nav
+          class="pg-nav"
+          aria-label="Resources"
         >
-        <button @click="signInWithHandlePrompt()">
-          Sign-in with handle
-        </button>
+          <a
+            class="pg-nav__link"
+            :href="docsUrl"
+          >Docs</a>
+          <a
+            class="pg-nav__link pg-nav__link--icon"
+            href="https://github.com/dxlliv/nuxt-atproto"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="GitHub repository"
+          >
+            <PlaygroundIcon name="github" :size="17" />
+          </a>
+        </nav>
+
+        <PlaygroundStatusBadge
+          class="pg-header__badge"
+          :status="status"
+        />
       </div>
-    </section>
+    </header>
 
-    <template v-if="account">
-      <hr>
+    <main class="pg-stack">
+      <PlaygroundAuthPanel
+        v-if="!isLogged"
+        @sign-in="signIn()"
+        @sign-in-with-handle="onSignInWithHandle"
+      />
 
-      <section>
-        <h4>Current session</h4>
+      <section
+        v-else
+        class="panel"
+      >
+        <h2 class="panel__section-title">
+          Active session
+        </h2>
 
-        <table>
-          <tbody>
-            <tr>
-              <td>
-                <a :href="`https://bsky.app/profile/${account.profile.handle}`">
-                  <img :src="account.profile.avatar">
-                  {{ account.profile.handle }}
-                </a>
-              </td>
-              <td>
-                <button @click="signOut()">
-                  Sign-out {{ account.profile.did }}
-                </button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </section>
-    </template>
+        <p
+          v-if="loadingProfile"
+          class="alert alert--loading"
+          role="status"
+        >
+          Loading profile from the network…
+        </p>
+        <p
+          v-else-if="profileError"
+          class="alert alert--error"
+          role="alert"
+        >
+          {{ profileError }}
+        </p>
 
-    <template v-if="Object.values(profiles).length > 0">
-      <hr>
-
-      <section>
-        <h4>List of available sessions</h4>
-
-        <table>
-          <tbody>
-            <tr
-              v-for="item of Object.values(profiles)"
-              :key="String(item.profile.did)"
+        <PlaygroundProfileCard
+          v-if="currentEntry"
+          :entry="currentEntry"
+          active
+        >
+          <template #actions>
+            <button
+              type="button"
+              class="btn btn--danger"
+              @click="signOut()"
             >
-              <td>
-                <a :href="`https://bsky.app/profile/${item.profile.handle}`">
-                  <img :src="item.profile.avatar">
-                  {{ item.profile.handle }}
-                </a>
-              </td>
-              <td>
-                <button @click="restore(item.profile.did)">
-                  Restore {{ item.profile.did }}
-                </button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+              Sign out
+            </button>
+          </template>
+        </PlaygroundProfileCard>
+
+        <p
+          v-else-if="session && !loadingProfile"
+          class="alert alert--loading"
+        >
+          Signed in as <code>{{ session.sub }}</code> — waiting for profile cache.
+        </p>
       </section>
-    </template>
 
-    <hr>
+      <section
+        v-if="otherEntries.length > 0"
+        class="panel"
+      >
+        <h2 class="panel__section-title">
+          Saved accounts
+        </h2>
+        <p class="panel__lead">
+          Profiles cached locally after login. Switch without leaving the app.
+        </p>
+        <div class="pg-stack">
+          <PlaygroundProfileCard
+            v-for="entry in otherEntries"
+            :key="entry.profile.did"
+            :entry="entry"
+            :active="session?.sub === entry.profile.did"
+          >
+            <template #actions>
+              <button
+                v-if="session?.sub !== entry.profile.did"
+                type="button"
+                class="btn btn--secondary"
+                @click="restore(entry.profile.did)"
+              >
+                Switch
+              </button>
+              <span
+                v-else
+                class="btn btn--ghost"
+                style="pointer-events: none;"
+              >
+                Current
+              </span>
+            </template>
+          </PlaygroundProfileCard>
+        </div>
+      </section>
 
-    <section>
-      <footer>
-        <a
+      <PlaygroundDevPanel
+        :status="status"
+        :is-logged="isLogged"
+      />
+    </main>
+
+    <footer class="pg-footer">
+      <p class="pg-footer__line">
+        <span class="pg-footer__brand"><span>nuxt</span>-atproto</span>
+        · <a :href="docsUrl">docs</a>
+        · <a
           href="https://github.com/dxlliv/nuxt-atproto"
           target="_blank"
-        >github.com/dxlliv/nuxt-atproto</a>
-      </footer>
-    </section>
-  </client-only>
+          rel="noopener noreferrer"
+        >github</a>
+        · <a
+          href="https://www.npmjs.com/package/nuxt-atproto"
+          target="_blank"
+          rel="noopener noreferrer"
+        >npm</a>
+      </p>
+    </footer>
+  </div>
 </template>
 
-<style>
-body {
-  font-family: sans-serif;
-  background: oklch(12.9% 0.042 264.695);
-  color: white;
-  padding: 12px;
+<style scoped>
+.panel__lead {
+  margin: -0.35rem 0 1rem;
+  font-size: 0.875rem;
+  color: var(--pg-muted);
 }
 
-hr {
-  background: rgba(255, 255, 255, 0.1);
-  height: 1px;
-  border: 0;
-}
-
-button {
-  cursor: pointer;
-  margin: 8px 0;
-  padding: 12px;
-  background: oklch(79.2% 0.209 151.711);
-  color: oklch(12.9% 0.042 264.695);
-  border: 0;
-  border-radius: 6px;
-  font-weight: bold;
-  font-size: 14px;
-}
-
-section {
-  padding: 12px;
-
-  h1 {
-    margin: 0 0 2px 0;
-
-    + a {
-      opacity: 0.5;
-    }
-  }
-
-  h4 {
-    margin: 0 0 12px 0;
-  }
-
-  a {
-    color: inherit;
-    text-decoration: none;
-  }
-
-  table {
-    tr {
-      td {
-        padding: 8px 0;
-
-        img {
-          max-width: 48px;
-          margin-right: 12px;
-          border-radius: 6px;
-          border: 3px solid white;
-          vertical-align: middle;
-        }
-
-        &:first-child {
-          width: 420px;
-        }
-      }
-    }
-  }
-
-  footer {
-    margin-top: 8px;
-    opacity: 0.25;
-  }
+code {
+  font-family: var(--pg-mono);
+  font-size: 0.85em;
+  color: var(--pg-accent);
 }
 </style>

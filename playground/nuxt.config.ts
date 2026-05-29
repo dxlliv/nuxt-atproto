@@ -2,6 +2,12 @@ export default defineNuxtConfig({
   modules: ['../src/module'],
   ssr: false,
   devtools: { enabled: true },
+  css: ['./assets/css/main.css'],
+  runtimeConfig: {
+    public: {
+      docsUrl: process.env.NUXT_PUBLIC_DOCS_URL || 'http://localhost:3456',
+    },
+  },
   devServer: {
     host: '127.0.0.1',
   },
@@ -20,6 +26,7 @@ export default defineNuxtConfig({
       public: 'https://public.api.bsky.app',
     },
     oauth: {
+      writeClientMetadata: true,
       clientMetadata: {
         // url of your remote client_metadata.json, leave the field empty
         // to let `nuxt-atproto` generate a local /public/client_metadata.json

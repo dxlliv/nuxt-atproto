@@ -14,6 +14,7 @@ export default defineNuxtModule<AtprotoNuxtOptions>({
       public: 'https://public.api.bsky.app',
     },
     oauth: {
+      writeClientMetadata: false,
       clientMetadata: {
         // load the client_metadata.json asynchronously from the URL
         remote: '',
@@ -91,15 +92,17 @@ export default defineNuxtModule<AtprotoNuxtOptions>({
       mode: 'client',
     })
 
-    try {
-      mkdirSync(publicDir, { recursive: true })
-      writeFileSync(
-        `${publicDir}/client-metadata.json`,
-        JSON.stringify(_options.oauth.clientMetadata.local, null, 2),
-      )
-    }
-    catch (error: unknown) {
-      console.warn('[nuxt-atproto] Failed to write public/client-metadata.json:', error)
+    if (_options.oauth.writeClientMetadata) {
+      try {
+        mkdirSync(publicDir, { recursive: true })
+        writeFileSync(
+          `${publicDir}/client-metadata.json`,
+          JSON.stringify(_options.oauth.clientMetadata.local, null, 2),
+        )
+      }
+      catch (error: unknown) {
+        console.warn('[nuxt-atproto] Failed to write public/client-metadata.json:', error)
+      }
     }
   },
 })
