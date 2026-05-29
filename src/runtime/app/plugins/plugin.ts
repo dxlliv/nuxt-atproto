@@ -8,7 +8,18 @@ export default defineNuxtPlugin({
   async setup(_nuxtApp) {
     const runtimeConfig = useRuntimeConfig()
 
-    // define ATProto OAuth client
+    // define ATProto OAuth client options
+
+    const clientOptions = {
+      handleResolver: runtimeConfig.public.atproto.serviceEndpoint.private,
+      onDelete: (sub: string, cause: unknown) => {
+        if (runtimeConfig.public.atproto.debug) {
+          console.warn(`Session deleted for ${sub}. Cause:`, cause)
+        }
+
+        _nuxtApp.hooks.callHook('atproto:sessionDeleted', sub)
+      },
+    }
 
     let atprotoOAuthClient: any
 
@@ -16,31 +27,19 @@ export default defineNuxtPlugin({
 
     if (runtimeConfig.public.atproto.oauth.clientMetadata.remote) {
       atprotoOAuthClient = await BrowserOAuthClient.load({
-        handleResolver: runtimeConfig.public.atproto.serviceEndpoint.private,
+        ...clientOptions,
         clientId: runtimeConfig.public.atproto.oauth.clientMetadata.remote,
         // todo implement custom fetch
       })
     }
     else {
       atprotoOAuthClient = new BrowserOAuthClient({
-        handleResolver: runtimeConfig.public.atproto.serviceEndpoint.private,
+        ...clientOptions,
         // @ts-ignore
         clientMetadata: import.meta.env.MODE === 'development' ? undefined : runtimeConfig.public.atproto.oauth.clientMetadata.local,
         // todo implement custom fetch
       })
     }
-
-    // event vent listener for OAuth session deleted
-
-    atprotoOAuthClient.addEventListener('deleted', (event: CustomEvent<{ sub: string, cause: unknown }>) => {
-      const { sub, cause } = event.detail
-
-      if (runtimeConfig.public.atproto.debug) {
-        console.warn(`Session deleted for ${sub}. Cause:`, cause)
-      }
-
-      _nuxtApp.hooks.callHook('atproto:sessionDeleted', sub)
-    })
 
     // initialize the client and handle ATProto OAuth callbacks
 
