@@ -1,7 +1,7 @@
-import { useAgent } from "../composables/useAgent"
+import { useAtprotoAgent } from '../composables/useAtprotoAgent'
 
 export async function resolveActorDid(handle: string): Promise<string> {
-  const agent = useAgent('public')
+  const agent = useAtprotoAgent('public')
 
   const { did } = await agent
     .com.atproto.identity

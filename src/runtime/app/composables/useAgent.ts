@@ -11,7 +11,8 @@ import {
 
 /**
  * Returns a cached AT Protocol agent for the given scope.
- * One instance per scope is shared across all components in the app.
+ *
+ * @deprecated Use `useAtprotoAgent` instead (`private` → `authenticated`).
  */
 export function useAgent(
   service: 'private' | 'public' | (string & {}),
