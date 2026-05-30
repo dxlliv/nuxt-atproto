@@ -1,0 +1,22 @@
+{
+  "client_id": "http://127.0.0.1:3456/nuxt-atproto/client-metadata.json",
+  "client_name": "nuxt-atproto docs",
+  "client_uri": "http://127.0.0.1:3456/nuxt-atproto/",
+  "logo_uri": "http://127.0.0.1:3456/nuxt-atproto/favicon.ico",
+  "tos_uri": "http://127.0.0.1:3456/nuxt-atproto/",
+  "policy_uri": "http://127.0.0.1:3456/nuxt-atproto/",
+  "redirect_uris": [
+    "http://127.0.0.1:3456/nuxt-atproto/"
+  ],
+  "scope": "atproto transition:generic",
+  "grant_types": [
+    "authorization_code",
+    "refresh_token"
+  ],
+  "response_types": [
+    "code"
+  ],
+  "token_endpoint_auth_method": "none",
+  "application_type": "web",
+  "dpop_bound_access_tokens": true
+}

@@ -29,7 +29,7 @@ defineProps<{
   padding: 0.85rem 1rem;
   border-radius: var(--pg-radius);
   border: 1px dashed var(--pg-border);
-  background: rgba(0, 0, 0, 0.2);
+  background: var(--pg-inset);
   font-size: 0.8rem;
 }
 

@@ -63,25 +63,49 @@ export default defineNuxtModule<AtprotoNuxtOptions>({
           ...(config.optimizeDeps?.include ?? []),
           '@atproto/oauth-client-browser',
           '@atproto/api',
+          'core-js',
         ],
+        esbuildOptions: {
+          ...config.optimizeDeps?.esbuildOptions,
+          define: {
+            ...config.optimizeDeps?.esbuildOptions?.define,
+            global: 'globalThis',
+          },
+        },
       }
+
+      const existingOutput = config.build?.rollupOptions?.output
+      const outputOptions = typeof existingOutput === 'object' && !Array.isArray(existingOutput)
+        ? existingOutput
+        : {}
 
       config.build = {
         ...config.build,
         commonjsOptions: {
           ...config.build?.commonjsOptions,
+          transformMixedEsModules: true,
           include: [
             ...(Array.isArray(config.build?.commonjsOptions?.include)
               ? config.build.commonjsOptions.include
               : []),
             /node_modules\/core-js/,
+            /node_modules\/@atproto\//,
           ],
+        },
+        rollupOptions: {
+          ...config.build?.rollupOptions,
+          output: {
+            ...outputOptions,
+            // core-js (via @atproto/oauth-client) can leave bare `exports` refs in the client chunk
+            banner: 'var exports=typeof exports!=="undefined"?exports:{};var module=typeof module!=="undefined"?module:{exports};',
+          },
         },
       }
 
       config.define = {
         ...config.define,
         'process.env': config.define?.['process.env'] ?? {},
+        global: 'globalThis',
       }
     })
 

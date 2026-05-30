@@ -1,0 +1,47 @@
+/*
+ * Playground + docs shared tokens.
+ * Light by default (Nuxt zinc); dark overrides when `.dark` is active.
+ */
+
+:root {
+  --pg-bg: #ffffff;
+  --pg-surface: #fafafa;
+  --pg-surface-raised: #f4f4f5;
+  --pg-border: rgba(0, 0, 0, 0.08);
+  --pg-text: #18181b;
+  --pg-muted: #71717a;
+  --pg-accent: #00c16a;
+  --pg-accent-dim: #00a155;
+  --pg-danger: #e11d48;
+  --pg-radius: 12px;
+  --pg-font: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --pg-mono: ui-monospace, 'Cascadia Code', 'SF Mono', Menlo, monospace;
+  --pg-max-width: 36rem;
+  --pg-shadow: 0 1px 2px rgba(0, 0, 0, 0.06), 0 8px 24px rgba(0, 0, 0, 0.08);
+  --pg-shadow-soft: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --pg-on-accent: #052e16;
+  --pg-inset: rgba(0, 0, 0, 0.04);
+  --pg-danger-text: #be123c;
+  --pg-danger-bg: rgba(225, 29, 72, 0.08);
+  --pg-danger-border: rgba(225, 29, 72, 0.22);
+}
+
+.dark,
+html.dark {
+  --pg-bg: #0c0d12;
+  --pg-surface: #14151c;
+  --pg-surface-raised: #1a1b24;
+  --pg-border: rgba(255, 255, 255, 0.08);
+  --pg-text: #f4f4f5;
+  --pg-muted: #a1a1aa;
+  --pg-accent: #00dc82;
+  --pg-accent-dim: #00a155;
+  --pg-danger: #fb7185;
+  --pg-shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 12px 40px rgba(0, 0, 0, 0.35);
+  --pg-shadow-soft: 0 1px 2px rgba(0, 0, 0, 0.25);
+  --pg-on-accent: #052e16;
+  --pg-inset: rgba(0, 0, 0, 0.28);
+  --pg-danger-text: #fecdd3;
+  --pg-danger-bg: rgba(251, 113, 133, 0.12);
+  --pg-danger-border: rgba(251, 113, 133, 0.25);
+}

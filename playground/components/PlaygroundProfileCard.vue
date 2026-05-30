@@ -4,6 +4,7 @@ import type { StoredProfileEntry } from '../composables/useStoredProfiles'
 defineProps<{
   entry: StoredProfileEntry
   active?: boolean
+  compact?: boolean
 }>()
 
 defineEmits<{
@@ -31,7 +32,10 @@ function formatRelativeTime(iso: string): string {
 <template>
   <article
     class="profile-card"
-    :class="{ 'profile-card--active': active }"
+    :class="{
+      'profile-card--active': active,
+      'profile-card--compact': compact,
+    }"
   >
     <div class="profile-card__media">
       <img
@@ -39,8 +43,8 @@ function formatRelativeTime(iso: string): string {
         :src="entry.profile.avatar"
         :alt="entry.profile.displayName || entry.profile.handle"
         class="profile-card__avatar"
-        width="64"
-        height="64"
+        :width="compact ? 40 : 64"
+        :height="compact ? 40 : 64"
       >
       <div
         v-else
@@ -74,12 +78,15 @@ function formatRelativeTime(iso: string): string {
         </a>
       </div>
       <p
-        v-if="entry.profile.description"
+        v-if="entry.profile.description && !compact"
         class="profile-card__bio"
       >
         {{ entry.profile.description }}
       </p>
-      <div class="profile-card__footer">
+      <div
+        v-if="!compact"
+        class="profile-card__footer"
+      >
         <code
           class="profile-card__did"
           :title="entry.profile.did"
@@ -169,7 +176,7 @@ function formatRelativeTime(iso: string): string {
   font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: #052e16;
+  color: var(--pg-on-accent);
   background: var(--pg-accent);
   border-radius: 999px;
 }
@@ -274,6 +281,66 @@ function formatRelativeTime(iso: string): string {
 
 .profile-card__actions :deep(.btn) {
   flex-shrink: 0;
+}
+
+.profile-card--compact {
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-areas: 'media body actions';
+  gap: 0.65rem 0.85rem;
+  align-items: center;
+  padding: 0.65rem 0;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.profile-card--compact:not(.profile-card--active):hover {
+  transform: none;
+}
+
+.profile-card--compact.profile-card--active {
+  border: none;
+  box-shadow: none;
+}
+
+.profile-card--compact .profile-card__media {
+  flex-direction: row;
+  gap: 0;
+}
+
+.profile-card--compact .profile-card__avatar,
+.profile-card--compact .profile-card__avatar--placeholder {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  border: none;
+  box-shadow: none;
+}
+
+.profile-card--compact .profile-card__avatar--placeholder {
+  font-size: 0.95rem;
+}
+
+.profile-card--compact .profile-card__status {
+  display: none;
+}
+
+.profile-card--compact .profile-card__display {
+  font-size: 0.8125rem;
+  line-height: 1.2;
+}
+
+.profile-card--compact .profile-card__handle {
+  margin-top: 0.05rem;
+  font-size: 0.72rem;
+}
+
+.profile-card--compact .profile-card__actions {
+  margin: 0;
+  padding: 0;
+  border-top: none;
+  justify-content: flex-end;
 }
 
 @media (max-width: 400px) {

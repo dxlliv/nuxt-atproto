@@ -17,8 +17,15 @@ export default defineNuxtConfig({
       include: [
         '@vue/devtools-core',
         '@vue/devtools-kit',
+        '@atproto/oauth-client-browser',
+        '@atproto/api',
+        'core-js',
       ],
     },
+  },
+
+  nitro: {
+    preset: 'static',
   },
   atproto: {
     serviceEndpoint: {

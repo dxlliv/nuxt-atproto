@@ -3,8 +3,10 @@ const props = withDefaults(
   defineProps<{
     /** When logged in, show a compact “add account” panel instead of the full sign-in hero. */
     addAccount?: boolean
+    /** Flat layout for docs hero embed — no icon hero, hint, or footnote. */
+    embedded?: boolean
   }>(),
-  { addAccount: false },
+  { addAccount: false, embedded: false },
 )
 
 const emit = defineEmits<{
@@ -26,11 +28,16 @@ function submitHandle(): void {
 
 <template>
   <section
-    class="auth-card panel"
-    :class="{ 'panel--featured': !props.addAccount, 'auth-card--compact': props.addAccount }"
+    class="auth-card"
+    :class="{
+      panel: !props.embedded,
+      'panel--featured': !props.addAccount && !props.embedded,
+      'auth-card--compact': props.addAccount,
+      'auth-card--embedded': props.embedded && !props.addAccount,
+    }"
   >
     <div
-      v-if="!props.addAccount"
+      v-if="!props.addAccount && !props.embedded"
       class="auth-card__hero"
     >
       <div
@@ -66,7 +73,45 @@ function submitHandle(): void {
     </div>
 
     <header
-      v-else
+      v-else-if="props.embedded && !props.addAccount"
+      class="auth-card__embed-header"
+    >
+      <div
+        class="auth-card__embed-mark"
+        aria-hidden="true"
+      >
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M12 3 4 8v8l8 5 8-5V8l-8-5Z"
+            stroke="currentColor"
+            stroke-width="1.5"
+            stroke-linejoin="round"
+          />
+          <path
+            d="M12 12 4 8m8 4 8-4M12 12v8"
+            stroke="currentColor"
+            stroke-width="1.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
+      </div>
+      <div class="auth-card__embed-copy">
+        <h2 class="auth-card__embed-title">
+          Sign in with ATProto
+        </h2>
+        <p class="auth-card__embed-lead">
+          OAuth runs in your browser — pick your PDS or enter a handle.
+        </p>
+      </div>
+    </header>
+
+    <header
+      v-else-if="props.addAccount"
       class="auth-card__compact-header"
     >
       <h2 class="auth-card__compact-title">
@@ -80,7 +125,8 @@ function submitHandle(): void {
     <div class="auth-card__methods">
       <button
         type="button"
-        class="btn btn--primary btn--lg btn--block auth-card__oauth"
+        class="btn btn--primary btn--block auth-card__oauth"
+        :class="{ 'btn--lg': !props.embedded, 'auth-card__oauth--embedded': props.embedded }"
         @click="emit('signIn')"
       >
         <span class="auth-card__oauth-icon" aria-hidden="true">
@@ -101,7 +147,7 @@ function submitHandle(): void {
         {{ props.addAccount ? 'Continue with another PDS' : 'Continue with your PDS' }}
       </button>
       <p
-        v-if="!props.addAccount"
+        v-if="!props.addAccount && !props.embedded"
         class="auth-card__hint"
       >
         Redirects to your personal data server for authorization.
@@ -109,6 +155,7 @@ function submitHandle(): void {
 
       <div
         class="auth-card__divider"
+        :class="{ 'auth-card__divider--plain': props.embedded }"
         role="separator"
       >
         <span>or sign in with handle</span>
@@ -116,6 +163,7 @@ function submitHandle(): void {
 
       <form
         class="auth-card__handle"
+        :class="{ 'auth-card__handle--embedded': props.embedded }"
         @submit.prevent="submitHandle"
       >
         <label
@@ -150,7 +198,7 @@ function submitHandle(): void {
     </div>
 
     <p
-      v-if="!props.addAccount"
+      v-if="!props.addAccount && !props.embedded"
       class="auth-card__footnote"
     >
       Sessions stay in the browser on this device.
@@ -159,6 +207,118 @@ function submitHandle(): void {
 </template>
 
 <style scoped>
+.auth-card--embedded {
+  padding: 0;
+}
+
+.auth-card__embed-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.85rem;
+  margin-bottom: 1.1rem;
+}
+
+.auth-card__embed-mark {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  color: var(--pg-accent);
+  background: color-mix(in srgb, var(--pg-accent) 12%, transparent);
+  border: none;
+  border-radius: 12px;
+}
+
+.auth-card__embed-mark svg {
+  width: 1.2rem;
+  height: 1.2rem;
+}
+
+.auth-card__embed-copy {
+  min-width: 0;
+  padding-top: 0.15rem;
+}
+
+.auth-card__embed-title {
+  margin: 0;
+  font-size: 0.975rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.3;
+  color: var(--pg-text);
+}
+
+.auth-card__embed-lead {
+  margin: 0.35rem 0 0;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: var(--pg-muted);
+}
+
+.auth-card--embedded .auth-card__methods {
+  gap: 1rem;
+}
+
+.auth-card__oauth--embedded {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  margin-top: 0;
+  padding: 0.7rem 1.15rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  border-radius: 10px;
+}
+
+.auth-card__divider--plain {
+  justify-content: center;
+  margin: 0.1rem 0;
+  gap: 0;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+.auth-card__divider--plain::before,
+.auth-card__divider--plain::after {
+  display: none;
+}
+
+.auth-card__handle--embedded {
+  padding: 0;
+  border: none;
+  background: transparent;
+  box-shadow: none;
+}
+
+.auth-card__handle--embedded .auth-card__label {
+  margin-bottom: 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--pg-muted);
+}
+
+.auth-card--embedded .input-group {
+  border-radius: 10px;
+  border-color: color-mix(in srgb, var(--pg-border) 80%, transparent);
+  background: var(--pg-surface-raised);
+}
+
+.auth-card--embedded .input-group__prefix {
+  padding: 0 0.65rem;
+}
+
+.auth-card--embedded .input-group__field {
+  padding: 0.6rem 0.5rem;
+}
+
+.auth-card--embedded .input-group__action {
+  margin: 0.3rem;
+}
+
 .auth-card--compact {
   padding-top: 1.15rem;
 }
@@ -272,7 +432,7 @@ function submitHandle(): void {
 .auth-card__handle {
   padding: 1rem;
   border-radius: 12px;
-  background: rgba(0, 0, 0, 0.28);
+  background: var(--pg-inset);
   border: 1px solid var(--pg-border);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
 }

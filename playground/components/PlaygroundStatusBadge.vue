@@ -46,7 +46,7 @@ const label = computed(() => {
   text-transform: uppercase;
   border-radius: 999px;
   border: 1px solid var(--pg-border);
-  background: rgba(0, 0, 0, 0.2);
+  background: var(--pg-surface-raised);
   color: var(--pg-muted);
   white-space: nowrap;
 }

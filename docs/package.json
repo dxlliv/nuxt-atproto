@@ -1,0 +1,15 @@
+{
+  "name": "nuxt-atproto-docs",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "nuxi dev --host 127.0.0.1 --port 3456",
+    "build": "nuxi build",
+    "generate": "nuxi generate",
+    "preview": "nuxi preview --host 127.0.0.1 --port 3456"
+  },
+  "dependencies": {
+    "docus": "^5.11.0",
+    "nuxt": "^4.4.6"
+  }
+}

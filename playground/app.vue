@@ -7,36 +7,7 @@ useHead({
 })
 
 const { public: { docsUrl } } = useRuntimeConfig()
-
-const { loadFromStorage, entries } = useStoredProfiles()
-
-const {
-  session,
-  isLogged,
-  status,
-  signIn,
-  signInWithHandle,
-  signOut,
-  restore,
-  loadingProfile,
-  profileError,
-  currentEntry,
-  registerSessionHooks,
-} = usePlaygroundSession()
-
-const otherEntries = computed(() =>
-  entries.value.filter(entry => entry.profile.did !== session.value?.sub),
-)
-
-registerSessionHooks()
-
-onMounted(() => {
-  loadFromStorage()
-})
-
-async function onSignInWithHandle(handle: string): Promise<void> {
-  await signInWithHandle(handle)
-}
+const { status } = usePlaygroundSession()
 </script>
 
 <template>
@@ -48,7 +19,7 @@ async function onSignInWithHandle(handle: string): Promise<void> {
             <span>nuxt</span>-atproto
           </h1>
           <p class="pg-header__tagline">
-            OAuth playground
+            AT Protocol authentication module for Nuxt
           </p>
         </div>
 
@@ -78,109 +49,8 @@ async function onSignInWithHandle(handle: string): Promise<void> {
       </div>
     </header>
 
-    <main class="pg-stack">
-      <PlaygroundAuthPanel
-        v-if="!isLogged"
-        @sign-in="signIn()"
-        @sign-in-with-handle="onSignInWithHandle"
-      />
-
-      <section
-        v-else
-        class="panel"
-      >
-        <h2 class="panel__section-title">
-          Active session
-        </h2>
-
-        <p
-          v-if="loadingProfile"
-          class="alert alert--loading"
-          role="status"
-        >
-          Loading profile from the network…
-        </p>
-        <p
-          v-else-if="profileError"
-          class="alert alert--error"
-          role="alert"
-        >
-          {{ profileError }}
-        </p>
-
-        <PlaygroundProfileCard
-          v-if="currentEntry"
-          :entry="currentEntry"
-          active
-        >
-          <template #actions>
-            <button
-              type="button"
-              class="btn btn--danger"
-              @click="signOut()"
-            >
-              Sign out
-            </button>
-          </template>
-        </PlaygroundProfileCard>
-
-        <p
-          v-else-if="session && !loadingProfile"
-          class="alert alert--loading"
-        >
-          Signed in as <code>{{ session.sub }}</code> — waiting for profile cache.
-        </p>
-      </section>
-
-      <PlaygroundAuthPanel
-        v-if="isLogged"
-        add-account
-        @sign-in="signIn()"
-        @sign-in-with-handle="onSignInWithHandle"
-      />
-
-      <section
-        v-if="otherEntries.length > 0"
-        class="panel"
-      >
-        <h2 class="panel__section-title">
-          Saved accounts
-        </h2>
-        <p class="panel__lead">
-          Profiles cached locally after login. Switch without leaving the app.
-        </p>
-        <div class="pg-stack">
-          <PlaygroundProfileCard
-            v-for="entry in otherEntries"
-            :key="entry.profile.did"
-            :entry="entry"
-            :active="session?.sub === entry.profile.did"
-          >
-            <template #actions>
-              <button
-                v-if="session?.sub !== entry.profile.did"
-                type="button"
-                class="btn btn--secondary"
-                @click="restore(entry.profile.did)"
-              >
-                Switch
-              </button>
-              <span
-                v-else
-                class="btn btn--ghost"
-                style="pointer-events: none;"
-              >
-                Current
-              </span>
-            </template>
-          </PlaygroundProfileCard>
-        </div>
-      </section>
-
-      <PlaygroundDevPanel
-        :status="status"
-        :is-logged="isLogged"
-      />
+    <main>
+      <PlaygroundDemo show-dev-panel />
     </main>
 
     <footer class="pg-footer">
@@ -201,17 +71,3 @@ async function onSignInWithHandle(handle: string): Promise<void> {
     </footer>
   </div>
 </template>
-
-<style scoped>
-.panel__lead {
-  margin: -0.35rem 0 1rem;
-  font-size: 0.875rem;
-  color: var(--pg-muted);
-}
-
-code {
-  font-family: var(--pg-mono);
-  font-size: 0.85em;
-  color: var(--pg-accent);
-}
-</style>
