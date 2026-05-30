@@ -75,7 +75,8 @@ const agent = useAtprotoAgent('authenticated')
 await agent.getTimeline()
 ```
 
-> **Client-only OAuth.** Wrap login UI in `<ClientOnly>` or disable SSR on auth routes. See the [introduction](https://dxlliv.github.io/nuxt-atproto/getting-started/introduction) in the docs.
+> **Client-only OAuth.** Wrap login UI in `<ClientOnly>` or disable SSR on auth routes.
+> See the [introduction](https://dxlliv.github.io/nuxt-atproto/getting-started/introduction) in the docs.
 
 ## Composables
 
@@ -89,7 +90,7 @@ await agent.getTimeline()
 
 ## License
 
-MIT
+Released under the [MIT License](./LICENSE).
 
 <!-- Badges -->
 [npm-version-src]: https://img.shields.io/npm/v/nuxt-atproto/latest.svg?style=flat&colorA=020420&colorB=00DC82
