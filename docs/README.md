@@ -1,6 +1,6 @@
 # nuxt-atproto documentation
 
-Docus site for the module. From the repo root:
+From the repo root:
 
 ```bash
 cd docs && pnpm install && pnpm dev
