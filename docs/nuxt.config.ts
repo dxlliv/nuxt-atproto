@@ -13,9 +13,16 @@ const clientMetadataUrl = `${siteOrigin}${basePath}/client-metadata.json`
 export default defineNuxtConfig({
   extends: ['docus'],
 
-  modules: ['../src/module'],
+  modules: [
+    '../src/module',
+    './modules/static-content-dump',
+  ],
 
   ssr: false,
+
+  app: {
+    baseURL: `${basePath}/`,
+  },
 
   css: [
     `${playgroundRoot}/assets/css/tokens.css`,
@@ -44,6 +51,7 @@ export default defineNuxtConfig({
   },
 
   site: {
+    url: siteOrigin,
     name: 'nuxt-atproto',
     description: 'AT Protocol OAuth authentication module for Nuxt — client-first sessions and cached agents.',
   },
@@ -72,6 +80,17 @@ export default defineNuxtConfig({
 
   nitro: {
     preset: 'static',
+    prerender: {
+      // h3 v1/v2 mismatch breaks sql_dump + sitemap handlers during prerender with ssr:false
+      ignore: [
+        '/__nuxt_content/',
+        '/sitemap.xml',
+      ],
+    },
+  },
+
+  routeRules: {
+    '/__nuxt_content/**/sql_dump.txt': { prerender: false },
   },
 
   runtimeConfig: {
@@ -115,5 +134,14 @@ export default defineNuxtConfig({
       },
     },
     debug: false,
+  },
+
+  hooks: {
+    // Run after Docus adds /sitemap.xml — handler fails on h3 v1/v2 mismatch during prerender.
+    'nitro:config'(nitroConfig) {
+      nitroConfig.prerender = nitroConfig.prerender || {}
+      nitroConfig.prerender.routes = (nitroConfig.prerender.routes || [])
+        .filter(route => route !== '/sitemap.xml' && !String(route).includes('sql_dump.txt'))
+    },
   },
 })
