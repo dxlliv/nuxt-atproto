@@ -5,8 +5,8 @@ const docusOverridesRoot = fileURLToPath(new URL('./app/components/app', import.
 
 const isDev = process.env.NODE_ENV === 'development'
 const siteOrigin = (process.env.NUXT_PUBLIC_SITE_ORIGIN
-  || (isDev ? 'http://127.0.0.1:3456' : 'https://dxlliv.github.io')).replace(/\/$/, '')
-const basePath = '/nuxt-atproto'
+  || (isDev ? 'http://127.0.0.1:3456' : 'https://nuxt-atproto.pages.dev')).replace(/\/$/, '')
+const basePath = process.env.NUXT_PUBLIC_BASE_PATH ?? ''
 const appUrl = `${siteOrigin}${basePath}/`
 const clientMetadataUrl = `${siteOrigin}${basePath}/client-metadata.json`
 

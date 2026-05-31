@@ -1,6 +1,6 @@
 {
   "name": "nuxt-atproto",
-  "version": "0.1.2",
+  "version": "0.1.0",
   "description": "Interact with AT Protocol and Bluesky in your Nuxt.js application",
   "keywords": [
     "nuxt",
@@ -12,7 +12,7 @@
   ],
   "license": "MIT",
   "repository": "nuxt-atproto",
-  "homepage": "https://github.com/dxlliv/nuxt-atproto",
+  "homepage": "https://nuxt-atproto.pages.dev",
   "author": {
     "name": "dxlliv",
     "url": "https://github.com/dxlliv"

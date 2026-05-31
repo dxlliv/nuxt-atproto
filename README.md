@@ -9,7 +9,7 @@
 
 ## Documentation
 
-**[Documentation](https://dxlliv.github.io/nuxt-atproto/)** — getting started, guides, and API reference.
+**[Documentation](https://nuxt-atproto.pages.dev/)** — getting started, guides, and API reference.
 
 Run the docs site locally:
 
@@ -17,7 +17,7 @@ Run the docs site locally:
 cd docs && pnpm install && pnpm dev
 ```
 
-Open **http://127.0.0.1:3456/nuxt-atproto/** (use `127.0.0.1`, not `localhost`, for the OAuth demo).
+Open **http://127.0.0.1:3456/** (use `127.0.0.1`, not `localhost`, for the OAuth demo).
 
 ## Features
 
@@ -76,7 +76,7 @@ await agent.getTimeline()
 ```
 
 > **Client-only OAuth.** Wrap login UI in `<ClientOnly>` or disable SSR on auth routes.
-> See the [introduction](https://dxlliv.github.io/nuxt-atproto/getting-started/introduction) in the docs.
+> See the [introduction](https://nuxt-atproto.pages.dev/getting-started/introduction) in the docs.
 
 ## Composables
 
@@ -86,7 +86,7 @@ await agent.getTimeline()
 | `useAtprotoAuth()` | `signIn`, `signInWithHandle`, `signOut`, `restore` |
 | `useAtprotoAgent(scope)` | Cached `Agent` / `AtpAgent` (`authenticated`, `public`, or custom URL) |
 
-`useAtproto()` and `useAgent()` are deprecated — see [Migration](https://dxlliv.github.io/nuxt-atproto/advanced/migration).
+`useAtproto()` and `useAgent()` are deprecated — see [Migration](https://nuxt-atproto.pages.dev/advanced/migration).
 
 ## License
 

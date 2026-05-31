@@ -5,7 +5,7 @@ export default defineNuxtConfig({
   css: ['./assets/css/main.css'],
   runtimeConfig: {
     public: {
-      docsUrl: process.env.NUXT_PUBLIC_DOCS_URL || 'https://dxlliv.github.io/nuxt-atproto/',
+      docsUrl: process.env.NUXT_PUBLIC_DOCS_URL || 'https://nuxt-atproto.pages.dev/',
     },
   },
   devServer: {
