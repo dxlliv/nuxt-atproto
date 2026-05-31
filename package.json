@@ -11,7 +11,10 @@
     "authentication"
   ],
   "license": "MIT",
-  "repository": "nuxt-atproto",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dxlliv/nuxt-atproto.git"
+  },
   "homepage": "https://nuxt-atproto.pages.dev",
   "author": {
     "name": "dxlliv",

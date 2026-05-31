@@ -149,6 +149,31 @@ html.dark .prose :where(code):not(:where(pre code)) {
   align-items: start;
 }
 
+@media (max-width: 639px) {
+  [data-page="index"] [data-slot="root"][data-orientation="horizontal"] {
+    align-items: center;
+    text-align: center;
+  }
+
+  [data-page="index"] [data-slot="title"],
+  [data-page="index"] [data-slot="description"] {
+    text-align: center;
+  }
+
+  [data-page="index"] [data-slot="links"] {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.75rem;
+  }
+
+  [data-page="index"] .hero-panel {
+    width: 100%;
+    max-width: 22rem;
+    margin-inline: auto;
+  }
+}
+
 [data-page="index"] .prose > :last-child {
   margin-bottom: 0;
 }

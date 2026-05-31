@@ -94,6 +94,13 @@ const features = [
   background: transparent !important;
 }
 
+@media (max-width: 639px) {
+  .home-features__header {
+    margin-inline: auto;
+    text-align: center;
+  }
+}
+
 .home-features__eyebrow {
   margin: 0 0 0.5rem;
   font-size: 0.75rem;

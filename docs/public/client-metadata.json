@@ -1,12 +1,12 @@
 {
-  "client_id": "http://127.0.0.1:3456/client-metadata.json",
+  "client_id": "https://nuxt-atproto.pages.dev/client-metadata.json",
   "client_name": "nuxt-atproto docs",
-  "client_uri": "http://127.0.0.1:3456/",
-  "logo_uri": "http://127.0.0.1:3456/favicon.ico",
-  "tos_uri": "http://127.0.0.1:3456/",
-  "policy_uri": "http://127.0.0.1:3456/",
+  "client_uri": "https://nuxt-atproto.pages.dev/",
+  "logo_uri": "https://nuxt-atproto.pages.dev/favicon.ico",
+  "tos_uri": "https://nuxt-atproto.pages.dev/",
+  "policy_uri": "https://nuxt-atproto.pages.dev/",
   "redirect_uris": [
-    "http://127.0.0.1:3456/"
+    "https://nuxt-atproto.pages.dev/"
   ],
   "scope": "atproto transition:generic",
   "grant_types": [
