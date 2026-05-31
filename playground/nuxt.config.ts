@@ -12,6 +12,10 @@ export default defineNuxtConfig({
     host: '127.0.0.1',
   },
   compatibilityDate: '2026-05-29',
+
+  nitro: {
+    preset: 'static',
+  },
   vite: {
     optimizeDeps: {
       include: [
@@ -22,10 +26,6 @@ export default defineNuxtConfig({
         'core-js',
       ],
     },
-  },
-
-  nitro: {
-    preset: 'static',
   },
   atproto: {
     serviceEndpoint: {

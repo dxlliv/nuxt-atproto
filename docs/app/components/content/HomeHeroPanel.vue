@@ -59,7 +59,7 @@ const { isLogged, session } = useAtprotoSession()
 const { signIn, signInWithHandle, signOut } = useAtprotoAuth()
 
 const handle = ref('')
-<\/script>
+${'</' + 'script>'}
 
 <template>
   <ClientOnly>

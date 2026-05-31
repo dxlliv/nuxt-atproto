@@ -20,31 +20,19 @@ export default defineNuxtConfig({
 
   ssr: false,
 
-  css: [
-    `${playgroundRoot}/assets/css/tokens.css`,
-    `${playgroundRoot}/assets/css/panel.css`,
+  components: [
+    { path: docusOverridesRoot, pathPrefix: false, priority: 1 },
+    { path: `${playgroundRoot}/components`, pathPrefix: false },
   ],
 
   imports: {
     dirs: [`${playgroundRoot}/composables`],
   },
 
-  components: [
-    { path: docusOverridesRoot, pathPrefix: false, priority: 1 },
-    { path: `${playgroundRoot}/components`, pathPrefix: false },
+  css: [
+    `${playgroundRoot}/assets/css/tokens.css`,
+    `${playgroundRoot}/assets/css/panel.css`,
   ],
-
-  alias: {
-    '@playground': playgroundRoot,
-  },
-
-  robots: {
-    robotsTxt: false,
-  },
-
-  ogImage: {
-    enabled: false,
-  },
 
   site: {
     url: siteOrigin,
@@ -57,22 +45,24 @@ export default defineNuxtConfig({
     fallback: 'light',
   },
 
+  runtimeConfig: {
+    public: {
+      playgroundUrl: process.env.NUXT_PUBLIC_PLAYGROUND_URL || appUrl,
+      docsUrl: process.env.NUXT_PUBLIC_DOCS_URL || appUrl,
+      siteOrigin,
+    },
+  },
+
+  alias: {
+    '@playground': playgroundRoot,
+  },
+
   devServer: {
     host: '127.0.0.1',
     port: 3456,
   },
 
   compatibilityDate: '2026-05-29',
-
-  vite: {
-    optimizeDeps: {
-      include: [
-        '@atproto/oauth-client-browser',
-        '@atproto/api',
-        'core-js',
-      ],
-    },
-  },
 
   nitro: {
     preset: 'static',
@@ -86,11 +76,22 @@ export default defineNuxtConfig({
     },
   },
 
-  runtimeConfig: {
-    public: {
-      playgroundUrl: process.env.NUXT_PUBLIC_PLAYGROUND_URL || appUrl,
-      docsUrl: process.env.NUXT_PUBLIC_DOCS_URL || appUrl,
-      siteOrigin,
+  vite: {
+    optimizeDeps: {
+      include: [
+        '@atproto/oauth-client-browser',
+        '@atproto/api',
+        'core-js',
+      ],
+    },
+  },
+
+  hooks: {
+    // Run after Docus adds /sitemap.xml — handler fails on h3 v1/v2 mismatch during prerender.
+    'nitro:config'(nitroConfig) {
+      nitroConfig.prerender = nitroConfig.prerender || {}
+      nitroConfig.prerender.routes = (nitroConfig.prerender.routes || [])
+        .filter(route => route !== '/sitemap.xml' && !String(route).includes('sql_dump.txt'))
     },
   },
 
@@ -129,12 +130,11 @@ export default defineNuxtConfig({
     debug: false,
   },
 
-  hooks: {
-    // Run after Docus adds /sitemap.xml — handler fails on h3 v1/v2 mismatch during prerender.
-    'nitro:config'(nitroConfig) {
-      nitroConfig.prerender = nitroConfig.prerender || {}
-      nitroConfig.prerender.routes = (nitroConfig.prerender.routes || [])
-        .filter(route => route !== '/sitemap.xml' && !String(route).includes('sql_dump.txt'))
-    },
+  ogImage: {
+    enabled: false,
+  },
+
+  robots: {
+    robotsTxt: false,
   },
 })

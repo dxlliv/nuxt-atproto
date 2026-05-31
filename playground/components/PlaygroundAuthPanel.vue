@@ -30,7 +30,7 @@ function submitHandle(): void {
   <section
     class="auth-card"
     :class="{
-      panel: !props.embedded,
+      'panel': !props.embedded,
       'panel--featured': !props.addAccount && !props.embedded,
       'auth-card--compact': props.addAccount && !props.embedded,
       'auth-card--embedded': props.embedded,
@@ -137,7 +137,10 @@ function submitHandle(): void {
         :class="{ 'btn--lg': !props.embedded, 'auth-card__oauth--embedded': props.embedded }"
         @click="emit('signIn')"
       >
-        <span class="auth-card__oauth-icon" aria-hidden="true">
+        <span
+          class="auth-card__oauth-icon"
+          aria-hidden="true"
+        >
           <svg
             viewBox="0 0 24 24"
             fill="none"

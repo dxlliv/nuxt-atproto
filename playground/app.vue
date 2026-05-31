@@ -41,7 +41,10 @@ const { status } = usePlaygroundSession()
             rel="noopener noreferrer"
             aria-label="GitHub repository"
           >
-            <PlaygroundIcon name="github" :size="17" />
+            <PlaygroundIcon
+              name="github"
+              :size="17"
+            />
           </a>
         </nav>
 

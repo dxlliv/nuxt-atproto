@@ -1,15 +1,15 @@
 import { describe, expect, it, vi } from 'vitest'
 import { ref } from 'vue'
 
-vi.mock('../src/runtime/app/utils/agentCache', () => ({
-  invalidateAtprotoPrivateAgent: vi.fn(),
-}))
-
 import {
   applyAtprotoSession,
   scheduleAtprotoSessionHooks,
 } from '../src/runtime/app/utils/sessionLifecycle'
 import type { AtprotoContext } from '../src/types'
+
+vi.mock('../src/runtime/app/utils/agentCache', () => ({
+  invalidateAtprotoPrivateAgent: vi.fn(),
+}))
 
 function createMockAtproto() {
   return {

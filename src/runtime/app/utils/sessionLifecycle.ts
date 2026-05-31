@@ -8,11 +8,11 @@ export interface AtprotoSessionLifecycleHooks {
   callHook: (name: string, did: string) => void | Promise<void>
 }
 
-export type AtprotoSessionTransition =
-  | 'oauth-return'
-  | 'cold-restore'
-  | 'account-switch'
-  | 'sign-out'
+export type AtprotoSessionTransition
+  = | 'oauth-return'
+    | 'cold-restore'
+    | 'account-switch'
+    | 'sign-out'
 
 export interface ApplyAtprotoSessionOptions {
   /** When true, lifecycle hooks run after `app:mounted` (plugin init). */

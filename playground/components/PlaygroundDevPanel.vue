@@ -5,7 +5,6 @@ defineProps<{
   status: SessionStatus
   isLogged: boolean
 }>()
-
 </script>
 
 <template>

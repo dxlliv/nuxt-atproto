@@ -105,7 +105,7 @@ export default defineNuxtModule<AtprotoNuxtOptions>({
       config.define = {
         ...config.define,
         'process.env': config.define?.['process.env'] ?? {},
-        global: 'globalThis',
+        'global': 'globalThis',
       }
     })
 
