@@ -53,7 +53,7 @@ const { status } = useAtprotoSession()
 }
 
 .home-demo--compact .home-demo__inner {
-  padding: 0.85rem 1.15rem 1rem;
+  padding: 0;
 }
 
 .home-demo__status {

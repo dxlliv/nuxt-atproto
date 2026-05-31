@@ -4,3 +4,7 @@ node_modules
 .data
 dist
 *.log
+.env
+.env.*
+!.env.example
+package-lock.json

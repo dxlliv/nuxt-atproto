@@ -20,10 +20,6 @@ export default defineNuxtConfig({
 
   ssr: false,
 
-  app: {
-    baseURL: `${basePath}/`,
-  },
-
   css: [
     `${playgroundRoot}/assets/css/tokens.css`,
     `${playgroundRoot}/assets/css/panel.css`,
@@ -81,16 +77,13 @@ export default defineNuxtConfig({
   nitro: {
     preset: 'static',
     prerender: {
-      // h3 v1/v2 mismatch breaks sql_dump + sitemap handlers during prerender with ssr:false
+      crawlLinks: true,
+      // h3 v1/v2 mismatch breaks sql_dump + sitemap handlers during prerender
       ignore: [
-        '/__nuxt_content/',
+        '/__nuxt_content/**/sql_dump.txt',
         '/sitemap.xml',
       ],
     },
-  },
-
-  routeRules: {
-    '/__nuxt_content/**/sql_dump.txt': { prerender: false },
   },
 
   runtimeConfig: {

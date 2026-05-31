@@ -32,8 +32,9 @@ function submitHandle(): void {
     :class="{
       panel: !props.embedded,
       'panel--featured': !props.addAccount && !props.embedded,
-      'auth-card--compact': props.addAccount,
-      'auth-card--embedded': props.embedded && !props.addAccount,
+      'auth-card--compact': props.addAccount && !props.embedded,
+      'auth-card--embedded': props.embedded,
+      'auth-card--embedded-add': props.embedded && props.addAccount,
     }"
   >
     <div
@@ -111,6 +112,13 @@ function submitHandle(): void {
     </header>
 
     <header
+      v-else-if="props.addAccount && props.embedded"
+      class="auth-card__embed-add-label"
+    >
+      Add account
+    </header>
+
+    <header
       v-else-if="props.addAccount"
       class="auth-card__compact-header"
     >
@@ -144,7 +152,7 @@ function submitHandle(): void {
             />
           </svg>
         </span>
-        {{ props.addAccount ? 'Continue with another PDS' : 'Continue with your PDS' }}
+        {{ props.addAccount ? (props.embedded ? 'Add with PDS' : 'Continue with another PDS') : 'Continue with your PDS' }}
       </button>
       <p
         v-if="!props.addAccount && !props.embedded"
@@ -158,15 +166,16 @@ function submitHandle(): void {
         :class="{ 'auth-card__divider--plain': props.embedded }"
         role="separator"
       >
-        <span>or sign in with handle</span>
+        <span>{{ props.embedded && props.addAccount ? 'or handle' : 'or sign in with handle' }}</span>
       </div>
 
       <form
         class="auth-card__handle"
-        :class="{ 'auth-card__handle--embedded': props.embedded }"
+        :class="{ 'auth-card__handle--embedded': props.embedded, 'auth-card__handle--embedded-add': props.embedded && props.addAccount }"
         @submit.prevent="submitHandle"
       >
         <label
+          v-if="!(props.embedded && props.addAccount)"
           class="auth-card__label"
           for="handle-input"
         >
@@ -191,7 +200,7 @@ function submitHandle(): void {
             class="btn btn--secondary input-group__action"
             :disabled="!canSubmitHandle"
           >
-            Sign in
+            {{ props.addAccount ? 'Add' : 'Sign in' }}
           </button>
         </div>
       </form>
@@ -317,6 +326,33 @@ function submitHandle(): void {
 
 .auth-card--embedded .input-group__action {
   margin: 0.3rem;
+}
+
+.auth-card--embedded-add {
+  padding: 0;
+}
+
+.auth-card__embed-add-label {
+  margin: 0 0 0.65rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--pg-muted);
+}
+
+.auth-card--embedded-add .auth-card__methods {
+  gap: 0.65rem;
+}
+
+.auth-card--embedded-add .auth-card__oauth--embedded {
+  padding: 0.55rem 0.85rem;
+  font-size: 0.8125rem;
+}
+
+.auth-card__handle--embedded-add .input-group__action {
+  padding-inline: 0.65rem;
+  font-size: 0.75rem;
 }
 
 .auth-card--compact {

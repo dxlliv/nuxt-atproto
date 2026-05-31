@@ -91,6 +91,7 @@ const features = [
 .home-features__header {
   max-width: 38rem;
   margin-bottom: 2rem;
+  background: transparent !important;
 }
 
 .home-features__eyebrow {

@@ -23,21 +23,38 @@
 }
 
 .pg-demo--compact.pg-stack {
-  gap: 1rem;
+  gap: 0;
+}
+
+.pg-demo--compact.pg-demo--logged-in.pg-stack {
+  gap: 0;
 }
 
 .pg-demo--compact .panel,
-.pg-demo--compact .auth-card--embedded {
+.pg-demo--compact .auth-card--embedded,
+.pg-demo--compact .auth-card--embedded-add {
   border: none;
   background: transparent;
   box-shadow: none;
   padding: 0;
 }
 
+.pg-demo--compact .panel--session-block {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.pg-demo--compact .panel__split {
+  height: 1px;
+  margin: 0.65rem 0;
+  background: color-mix(in srgb, var(--pg-border) 70%, transparent);
+}
+
 .pg-demo--compact .panel--accounts-compact {
   border-top: none;
-  padding-top: 0.85rem;
-  margin-top: 0.35rem;
+  padding-top: 0;
+  margin-top: 0;
 }
 
 .pg-demo .panel--accounts-compact {

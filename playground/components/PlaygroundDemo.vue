@@ -57,7 +57,10 @@ async function onSignInWithHandle(handle: string): Promise<void> {
 <template>
   <div
     class="pg-demo pg-stack"
-    :class="{ 'pg-demo--compact': props.compact }"
+    :class="{
+      'pg-demo--compact': props.compact,
+      'pg-demo--logged-in': isLogged,
+    }"
   >
     <PlaygroundAuthPanel
       v-if="!isLogged"
@@ -69,7 +72,10 @@ async function onSignInWithHandle(handle: string): Promise<void> {
     <section
       v-else
       class="panel"
-      :class="{ 'panel--compact': props.compact }"
+      :class="{
+        'panel--compact': props.compact,
+        'panel--session-block': props.compact,
+      }"
     >
       <h2
         v-if="!props.compact"
@@ -117,6 +123,20 @@ async function onSignInWithHandle(handle: string): Promise<void> {
       >
         Signed in as <code>{{ session.sub }}</code> — waiting for profile cache.
       </p>
+
+      <template v-if="props.compact">
+        <div
+          class="panel__split"
+          role="separator"
+        />
+
+        <PlaygroundAuthPanel
+          add-account
+          embedded
+          @sign-in="signIn()"
+          @sign-in-with-handle="onSignInWithHandle"
+        />
+      </template>
     </section>
 
     <PlaygroundAuthPanel
@@ -134,6 +154,12 @@ async function onSignInWithHandle(handle: string): Promise<void> {
         'panel--accounts-compact': props.compact,
       }"
     >
+      <div
+        v-if="props.compact"
+        class="panel__split"
+        role="separator"
+      />
+
       <template v-if="!props.compact">
         <h2 class="panel__section-title">
           Saved accounts

@@ -1,5 +1,8 @@
 <script setup lang="ts">
 useHead({
+  htmlAttrs: {
+    class: 'dark',
+  },
   title: 'nuxt-atproto playground',
   meta: [
     { name: 'description', content: 'Interactive demo for the nuxt-atproto Nuxt module' },

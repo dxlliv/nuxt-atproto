@@ -57,7 +57,6 @@ html:not(.dark) body {
 .light header,
 html:not(.dark) header {
   border-color: var(--ui-border) !important;
-  background: color-mix(in srgb, var(--ui-bg) 92%, transparent) !important;
   backdrop-filter: blur(10px);
 }
 
@@ -148,23 +147,6 @@ html.dark .prose :where(code):not(:where(pre code)) {
 
 [data-page="index"] [data-slot="root"][data-orientation="horizontal"] {
   align-items: start;
-}
-
-[data-page="index"] .hero-panel__body {
-  display: grid;
-}
-
-[data-page="index"] .hero-panel__body > [role='tabpanel'] {
-  grid-area: 1 / 1;
-  min-width: 0;
-}
-
-[data-page="index"] .hero-panel__tabpanel--hidden {
-  visibility: hidden;
-  pointer-events: none;
-  overflow: hidden;
-  height: 0;
-  min-height: 0;
 }
 
 [data-page="index"] .prose > :last-child {

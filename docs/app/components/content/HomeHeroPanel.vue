@@ -1,16 +1,20 @@
 <script setup lang="ts">
-type PanelMode = 'code' | 'playground'
-type CodeFile = 'config' | 'app'
+import type { TabsItem } from '@nuxt/ui'
 
-const COLLAPSED_LINES = 15
+type PanelMode = 'playground' | 'code'
+type CodeFile = 'config' | 'app'
 
 const route = useRoute()
 const colorMode = useColorMode()
-const panel = ref<PanelMode>('code')
+const panel = ref<PanelMode>('playground')
 const codeFile = ref<CodeFile>('config')
-const expanded = ref(false)
 const highlightedHtml = ref('')
 const highlighting = ref(false)
+
+const modeItems: TabsItem[] = [
+  { label: 'Try it out', value: 'playground' },
+  { label: 'Code', value: 'code' },
+]
 
 const nuxtConfig = `export default defineNuxtConfig({
   modules: ['nuxt-atproto'],
@@ -83,40 +87,17 @@ const handle = ref('')
   </ClientOnly>
 </template>`
 
-const activeSource = computed(() =>
-  codeFile.value === 'config'
-    ? { label: 'nuxt.config.ts', code: nuxtConfig }
-    : { label: 'app.vue', code: appVue },
-)
-
-const lineCount = computed(() => activeSource.value.code.split('\n').length)
-
-const canExpand = computed(() => lineCount.value > COLLAPSED_LINES)
-
-function setPanel(mode: PanelMode): void {
-  panel.value = mode
-}
-
-function setCodeFile(file: CodeFile): void {
-  codeFile.value = file
-  expanded.value = false
-}
-
 watch(() => route.hash, (hash) => {
   if (hash === '#try-it') {
     panel.value = 'playground'
   }
 }, { immediate: true })
 
-watch(codeFile, () => {
-  expanded.value = false
-})
-
 async function refreshHighlight(): Promise<void> {
   highlighting.value = true
   try {
     highlightedHtml.value = await highlightHeroCode(
-      activeSource.value.code,
+      codeFile.value === 'config' ? nuxtConfig : appVue,
       codeFile.value,
       colorMode.value,
     )
@@ -138,113 +119,82 @@ watch([codeFile, () => colorMode.value], () => {
   >
     <UCard
       :ui="{
-        root: 'ring ring-default/60 bg-elevated/40',
+        root: 'overflow-hidden rounded-xl ring-1 ring-default/40 bg-elevated/30',
         body: 'p-0 sm:p-0',
-        header: 'px-4 pt-4 pb-3 border-b border-default/60',
       }"
     >
-      <template #header>
-        <div
-          class="hero-panel__modes"
-          role="tablist"
-          aria-label="Hero panel"
-        >
-          <button
-            type="button"
-            role="tab"
-            class="hero-panel__chip"
-            :class="{ 'hero-panel__chip--active': panel === 'code' }"
-            :aria-selected="panel === 'code'"
-            @click="setPanel('code')"
-          >
-            Code
-          </button>
-          <button
-            type="button"
-            role="tab"
-            class="hero-panel__chip"
-            :class="{ 'hero-panel__chip--active': panel === 'playground' }"
-            :aria-selected="panel === 'playground'"
-            @click="setPanel('playground')"
-          >
-            Try it out
-          </button>
-        </div>
-      </template>
-
-      <div class="hero-panel__body">
-        <div
-          role="tabpanel"
-          class="hero-panel__code"
-          :class="{ 'hero-panel__tabpanel--hidden': panel !== 'code' }"
-          :aria-hidden="panel !== 'code'"
-          :inert="panel !== 'code'"
-        >
-        <div
-          class="hero-panel__files"
-          role="tablist"
-          aria-label="Source files"
-        >
-          <button
-            type="button"
-            role="tab"
-            class="hero-panel__file-chip"
-            :class="{ 'hero-panel__file-chip--active': codeFile === 'config' }"
-            :aria-selected="codeFile === 'config'"
-            @click="setCodeFile('config')"
-          >
-            nuxt.config.ts
-          </button>
-          <button
-            type="button"
-            role="tab"
-            class="hero-panel__file-chip"
-            :class="{ 'hero-panel__file-chip--active': codeFile === 'app' }"
-            :aria-selected="codeFile === 'app'"
-            @click="setCodeFile('app')"
-          >
-            app.vue
-          </button>
-        </div>
-
-        <div
-          class="hero-panel__pre-wrap"
-          :class="{
-            'hero-panel__pre-wrap--collapsed': canExpand && !expanded,
-            'hero-panel__pre-wrap--loading': highlighting && !highlightedHtml,
-          }"
-        >
-          <div
-            v-if="highlightedHtml"
-            class="hero-panel__pre shiki-host"
-            v-html="highlightedHtml"
+      <div class="hero-panel__shell">
+        <div class="hero-panel__tabs-wrap">
+          <UTabs
+            v-model="panel"
+            :items="modeItems"
+            :content="false"
+            variant="link"
+            color="neutral"
+            size="sm"
+            class="hero-panel__tabs"
           />
         </div>
 
-        <div
-          v-if="canExpand"
-          class="hero-panel__expand"
-        >
-          <UButton
-            color="neutral"
-            variant="ghost"
-            size="xs"
-            :icon="expanded ? 'i-lucide-chevron-up' : 'i-lucide-chevron-down'"
-            @click="expanded = !expanded"
+        <div class="hero-panel__body">
+          <div
+            class="hero-panel__playground"
+            :class="{ 'hero-panel__playground--hidden': panel !== 'playground' }"
+            :aria-hidden="panel !== 'playground'"
           >
-            {{ expanded ? 'Show less' : `Show all (${lineCount} lines)` }}
-          </UButton>
-        </div>
-        </div>
+            <HomeDemo compact />
+          </div>
 
-        <div
-          role="tabpanel"
-          class="hero-panel__playground"
-          :class="{ 'hero-panel__tabpanel--hidden': panel !== 'playground' }"
-          :aria-hidden="panel !== 'playground'"
-          :inert="panel !== 'playground'"
-        >
-          <HomeDemo compact />
+          <div
+            class="hero-panel__code"
+            :class="{ 'hero-panel__code--hidden': panel !== 'code' }"
+            :aria-hidden="panel !== 'code'"
+            :inert="panel !== 'code'"
+          >
+            <div
+              class="hero-panel__files"
+              role="tablist"
+              aria-label="Source files"
+            >
+              <button
+                type="button"
+                role="tab"
+                class="hero-panel__file"
+                :class="{ 'hero-panel__file--active': codeFile === 'config' }"
+                :aria-selected="codeFile === 'config'"
+                @click="codeFile = 'config'"
+              >
+                nuxt.config.ts
+              </button>
+              <button
+                type="button"
+                role="tab"
+                class="hero-panel__file"
+                :class="{ 'hero-panel__file--active': codeFile === 'app' }"
+                :aria-selected="codeFile === 'app'"
+                @click="codeFile = 'app'"
+              >
+                app.vue
+              </button>
+            </div>
+
+            <div
+              class="hero-panel__pre-wrap"
+              :class="{ 'hero-panel__pre-wrap--loading': highlighting && !highlightedHtml }"
+            >
+              <div
+                v-if="highlighting && !highlightedHtml"
+                class="hero-panel__loading"
+              >
+                Loading…
+              </div>
+              <div
+                v-else-if="highlightedHtml"
+                class="hero-panel__pre shiki-host"
+                v-html="highlightedHtml"
+              />
+            </div>
+          </div>
         </div>
       </div>
     </UCard>
@@ -257,117 +207,113 @@ watch([codeFile, () => colorMode.value], () => {
   min-width: 0;
 }
 
-.hero-panel__modes {
+.hero-panel__shell {
   display: flex;
-  flex-wrap: wrap;
-  gap: 0.4rem;
+  flex-direction: column;
 }
 
-.hero-panel__chip {
-  padding: 0.35rem 0.85rem;
-  font-size: 0.8125rem;
-  font-weight: 600;
-  line-height: 1.25;
-  color: var(--ui-text-muted);
-  background: transparent;
-  border: 1px solid var(--ui-border);
-  border-radius: 999px;
-  cursor: pointer;
-  transition: color 0.15s, background 0.15s, border-color 0.15s;
+.hero-panel__tabs-wrap {
+  padding: 0.85rem 1rem 0.65rem;
+  border-bottom: 1px solid color-mix(in srgb, var(--ui-border) 65%, transparent);
 }
 
-.hero-panel__chip:hover {
-  color: var(--ui-text);
-  border-color: var(--ui-border-accented);
+.hero-panel__tabs :deep([data-slot='list']) {
+  gap: 1rem;
+  border: none;
 }
 
-.hero-panel__chip--active {
-  color: var(--ui-text-inverted);
-  background: var(--ui-primary);
-  border-color: var(--ui-primary);
+.hero-panel__tabs :deep([data-slot='trigger']) {
+  padding-inline: 0;
+  font-weight: 500;
+}
+
+.hero-panel__body {
+  position: relative;
+  min-height: 20rem;
+  padding: 0.85rem 1rem 1rem;
+}
+
+.hero-panel__body:has(.pg-demo--logged-in) {
+  min-height: 17.5rem;
+}
+
+.hero-panel__playground--hidden {
+  visibility: hidden;
+  pointer-events: none;
 }
 
 .hero-panel__code {
+  position: absolute;
+  inset: 0.85rem 1rem 1rem;
   display: flex;
   flex-direction: column;
+  gap: 0.65rem;
   min-height: 0;
-  padding: 0.85rem 1rem 0.75rem;
+}
+
+.hero-panel__code--hidden {
+  visibility: hidden;
+  pointer-events: none;
 }
 
 .hero-panel__files {
   display: flex;
+  flex-shrink: 0;
   flex-wrap: wrap;
-  gap: 0.35rem;
-  margin-bottom: 0.75rem;
+  gap: 0.75rem;
 }
 
-.hero-panel__file-chip {
-  padding: 0.2rem 0.55rem;
+.hero-panel__file {
+  padding: 0;
   font-family: var(--font-mono);
-  font-size: 0.72rem;
+  font-size: 0.75rem;
   font-weight: 500;
   color: var(--ui-text-muted);
-  background: var(--ui-bg-muted);
-  border: 1px solid transparent;
-  border-radius: 6px;
+  background: none;
+  border: none;
   cursor: pointer;
-  transition: color 0.15s, background 0.15s, border-color 0.15s;
+  transition: color 0.15s;
 }
 
-.hero-panel__file-chip:hover {
+.hero-panel__file:hover {
   color: var(--ui-text);
 }
 
-.hero-panel__file-chip--active {
-  color: var(--ui-primary);
-  background: color-mix(in srgb, var(--ui-primary) 12%, transparent);
-  border-color: color-mix(in srgb, var(--ui-primary) 35%, transparent);
+.hero-panel__file--active {
+  color: var(--ui-text-highlighted);
 }
 
 .hero-panel__pre-wrap {
-  position: relative;
-  border-radius: 8px;
-  border: 1px solid var(--ui-border-muted);
-  background: var(--ui-bg-muted);
-  overflow: auto;
-}
-
-.hero-panel__pre-wrap--collapsed {
-  max-height: 15.5rem;
-  overflow: hidden;
-}
-
-.hero-panel__pre-wrap:not(.hero-panel__pre-wrap--collapsed) {
   flex: 1;
   min-height: 0;
-}
-
-.hero-panel__pre-wrap--collapsed::after {
-  content: '';
-  position: absolute;
-  inset: auto 0 0;
-  height: 3rem;
-  background: linear-gradient(to bottom, transparent, var(--ui-bg-muted));
-  pointer-events: none;
+  overflow: auto;
+  border-radius: 0.375rem;
+  background: color-mix(in srgb, var(--ui-bg) 40%, transparent);
 }
 
 .hero-panel__pre-wrap--loading {
-  min-height: 8rem;
+  display: flex;
+  align-items: flex-start;
+}
+
+.hero-panel__loading {
+  padding: 0.85rem 0.75rem;
+  font-size: 0.8125rem;
+  color: var(--ui-text-muted);
 }
 
 .hero-panel__pre {
   margin: 0;
-  min-height: 0;
 }
 
 .hero-panel__pre :deep(pre.shiki) {
   margin: 0;
-  padding: 0.85rem 1rem;
+  padding: 0.35rem 0.25rem;
   overflow: visible;
   background: transparent !important;
   font-family: var(--font-mono);
   font-size: 0.72rem;
-  line-height: 0.65;
+  line-height: 0.7;
   tab-size: 2;
 }
 
@@ -380,35 +326,27 @@ watch([codeFile, () => colorMode.value], () => {
   display: block;
 }
 
-.hero-panel__expand {
+.hero-panel__playground :deep(.pg-demo--compact) {
   display: flex;
-  justify-content: center;
-  padding-top: 0.35rem;
+  flex-direction: column;
 }
 
-.hero-panel__body {
-  display: grid;
-}
-
-.hero-panel__body > [role='tabpanel'] {
-  grid-area: 1 / 1;
-  min-width: 0;
-}
-
-.hero-panel__tabpanel--hidden {
-  visibility: hidden;
-  pointer-events: none;
-  overflow: hidden;
-  height: 0;
-  min-height: 0;
-}
-
-.hero-panel__playground {
-  overflow: visible;
+.hero-panel__playground :deep(.panel),
+.hero-panel__playground :deep(.auth-card),
+.hero-panel__playground :deep(.profile-card) {
+  border: none;
+  box-shadow: none;
+  background: transparent;
 }
 
 .hero-panel__playground :deep(.alert) {
-  padding: 0.5rem 0.65rem;
+  padding: 0.45rem 0;
+  background: transparent;
+  border: none;
   font-size: 0.8125rem;
+}
+
+.pg-demo .panel {
+  padding: 0;
 }
 </style>
