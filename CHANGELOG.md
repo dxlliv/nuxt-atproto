@@ -1,5 +1,17 @@
 # Changelog
 
+## v0.1.1
+
+[compare changes](https://github.com/dxlliv/nuxt-atproto/compare/v0.1.0...v0.1.1)
+
+### 🩹 Fixes
+
+- **vite:** Remove core-js from optimizeDeps.include to avoid browser require errors ([9af142c](https://github.com/dxlliv/nuxt-atproto/commit/9af142c))
+
+### ❤️ Contributors
+
+- Dxlliv <dxlliv@proton.me>
+
 ## v0.1.0
 
 [compare changes](https://github.com/dxlliv/nuxt-atproto/compare/v0.0.5...v0.1.0)
