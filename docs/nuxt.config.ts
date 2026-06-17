@@ -81,7 +81,6 @@ export default defineNuxtConfig({
       include: [
         '@atproto/oauth-client-browser',
         '@atproto/api',
-        'core-js',
       ],
     },
   },

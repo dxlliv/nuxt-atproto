@@ -19,11 +19,8 @@ export default defineNuxtConfig({
   vite: {
     optimizeDeps: {
       include: [
-        '@vue/devtools-core',
-        '@vue/devtools-kit',
         '@atproto/oauth-client-browser',
         '@atproto/api',
-        'core-js',
       ],
     },
   },

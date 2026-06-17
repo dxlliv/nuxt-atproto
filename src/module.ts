@@ -63,7 +63,6 @@ export default defineNuxtModule<AtprotoNuxtOptions>({
           ...(config.optimizeDeps?.include ?? []),
           '@atproto/oauth-client-browser',
           '@atproto/api',
-          'core-js',
         ],
         esbuildOptions: {
           ...config.optimizeDeps?.esbuildOptions,
