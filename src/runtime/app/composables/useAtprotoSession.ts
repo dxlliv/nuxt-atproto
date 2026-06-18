@@ -25,6 +25,11 @@ export function useAtprotoSession(): UseAtprotoSessionReturn {
 
   const { $atproto } = useNuxtApp()
 
+  if (!$atproto) {
+    console.warn('[nuxt-atproto] $atproto is not registered on NuxtApp. Make sure the plugin is loaded.')
+    return serverSessionReturn
+  }
+
   return {
     session: $atproto.session,
     isLogged: computed(() => !!$atproto.session.value),
